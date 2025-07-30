@@ -1393,7 +1393,7 @@ class FluxwallWallpaperManager: ObservableObject {
     static let shared = FluxwallWallpaperManager()
     
     @Published var isVideoActive = false
-    @Published var currentWallpaperName = "系统默认"
+    @Published var currentWallpaperName = LocalizedStrings.current.systemDefault
     @Published var isVideoPaused = false
     
     private var desktopWindows: [CGDirectDisplayID: DesktopOverlayWindow] = [:]
@@ -1801,7 +1801,7 @@ class FluxwallWallpaperManager: ObservableObject {
             
             // 更新状态
             print("[DEBUG] 更新状态")
-            self.currentWallpaperName = "系统默认"
+            self.currentWallpaperName = LocalizedStrings.current.systemDefault
             self.isVideoActive = false
             self.isVideoPaused = false
             
