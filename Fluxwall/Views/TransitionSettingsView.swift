@@ -241,7 +241,7 @@ struct TransitionTypeButton: View {
                 )
                 
                 // 文本 - 紧凑化
-                Text(type.description)
+                Text(getTransitionTypeName(type))
                     .font(.system(size: 10))
                     .foregroundColor(isEnabled ? .primary : .secondary)
             }
@@ -250,6 +250,15 @@ struct TransitionTypeButton: View {
         .opacity(isEnabled ? 1.0 : 0.5)
         .scaleEffect(isPressed ? 0.98 : 1.0)
         .animation(.easeInOut(duration: 0.1), value: isPressed)
+    }
+    
+    private func getTransitionTypeName(_ type: TransitionType) -> String {
+        switch type {
+        case .fade:
+            return LocalizedStrings.current.transitionFade
+        case .blackout:
+            return LocalizedStrings.current.transitionBlackout
+        }
     }
 }
 
