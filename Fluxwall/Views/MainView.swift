@@ -3,27 +3,81 @@ import AppKit
 import UniformTypeIdentifiers
 import AVKit
 
+struct RefreshButton: View {
+    let action: () -> Void
+    @State private var isPressed = false
+    @State private var rotationAngle: Double = 0
+    
+    var body: some View {
+        Button(action: {
+            // Trigger rotation animation
+            withAnimation(.easeInOut(duration: 0.6)) {
+                rotationAngle += 360
+            }
+            
+            // Call the refresh action
+            action()
+        }) {
+            Image(systemName: "arrow.clockwise")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.secondary)
+                .rotationEffect(.degrees(rotationAngle))
+                .scaleEffect(isPressed ? 0.9 : 1.0)
+                .animation(.easeInOut(duration: 0.1), value: isPressed)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .padding(6)
+        .background(
+            Circle()
+                .fill(Color(.controlBackgroundColor))
+                .opacity(isPressed ? 0.8 : 0.6)
+        )
+        .onPressGesture(
+            onPress: { isPressed = true },
+            onRelease: { isPressed = false }
+        )
+        .help(LocalizedStrings.current.refresh)
+    }
+}
+
+// Helper for press gesture
+extension View {
+    func onPressGesture(onPress: @escaping () -> Void, onRelease: @escaping () -> Void) -> some View {
+        self.simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in onPress() }
+                .onEnded { _ in onRelease() }
+        )
+    }
+}
+
 struct MainView: View {
     @StateObject private var wallpaperManager = FluxwallWallpaperManager.shared
     @StateObject private var languageSettings = LanguageSettings.shared
     @State private var statusMessage = ""
-    @State private var selectedTransitionType: TransitionType = .fade
+    @State private var selectedTransitionType: TransitionType = .none
     @State private var transitionDuration: Double = 1.0
     @State private var selectedMediaURL: URL? = nil
+    @State private var selectedSystemWallpaper: SystemWallpaper? = nil
     @State private var selectedDisplayID: CGDirectDisplayID?
-    @State private var displays: [DisplayInfo] = [] // ✅ 添加
+    @State private var displays: [DisplayInfo] = []
     @State private var previewImage: NSImage? = nil
     @State private var firstFrame: NSImage? = nil
     @State private var lastFrame: NSImage? = nil
     @State private var scale: CGFloat = 1.0
     @State private var offset: CGSize = .zero
     @State private var showingSettings = false
+    
+    // Calculate if there's a selected wallpaper (user file or system wallpaper)
+    private var hasSelectedWallpaper: Bool {
+        selectedMediaURL != nil || selectedSystemWallpaper != nil
+    }
 
     var body: some View {
         VStack(spacing: 0) {
-            // 标题和设置按钮
+            // Title and settings button
             ZStack {
-                // 居中的标题
+                // Centered title
                 VStack(spacing: 4) {
                     Text(LocalizedStrings.current.appTitle)
                         .font(.system(size: 22, weight: .bold))
@@ -32,7 +86,7 @@ struct MainView: View {
                         .foregroundColor(.secondary)
                 }
                 
-                // 右上角的设置按钮
+                // Top-right settings button
                 HStack {
                     Spacer()
                     Button(action: {
@@ -63,10 +117,31 @@ struct MainView: View {
                     }
                     .frame(width: columnWidth, height: availableHeight)
 
-                    VStack {
-                        Spacer()
+                    // Middle column: split layout
+                    VStack(spacing: 12) {
+                        // Top half: built-in wallpapers
+                        VStack(spacing: 8) {
+                            HStack {
+                                Text(LocalizedStrings.current.builtInWallpapers)
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.primary)
+                                Spacer()
+                                RefreshButton {
+                                    WallpaperIndexer.shared.indexWallpapers()
+                                }
+                            }
+                            
+                            BuiltInWallpapersView { wallpaper in
+                                handleSystemWallpaperSelection(wallpaper)
+                            }
+                        }
+                        .padding(12)
+                        .background(RoundedRectangle(cornerRadius: 10).fill(Color(.windowBackgroundColor)))
+                        .frame(maxHeight: .infinity)
+                        
+                        // Bottom half: crop preview area
                         cropPreviewPanel()
-                        Spacer()
+                            .frame(maxHeight: .infinity)
                     }
                     .frame(width: columnWidth, height: availableHeight)
 
@@ -84,8 +159,8 @@ struct MainView: View {
             statusMessage = LocalizedStrings.current.ready
         }
         .onChange(of: languageSettings.currentLanguage) { _ in
-            // 语言切换时更新状态消息
-            if selectedMediaURL == nil {
+            // Update status message when language changes
+            if !hasSelectedWallpaper {
                 statusMessage = LocalizedStrings.current.ready
             }
         }
@@ -94,7 +169,7 @@ struct MainView: View {
         }
     }
 
-    // MARK: - 左列：文件选择
+    // MARK: - Left Column: File Selection
     @ViewBuilder
     private func fileSelectionPanel() -> some View {
         VStack(spacing: 12) {
@@ -165,7 +240,7 @@ struct MainView: View {
         .background(RoundedRectangle(cornerRadius: 10).fill(Color(.windowBackgroundColor)))
     }
 
-    // MARK: - 显示器选择
+    // MARK: - Display Selection
     @ViewBuilder
     private func displaySelectorPanel() -> some View {
         DisplaySelectorView(displays: $displays, onDisplaySelected: { displayID in
@@ -175,7 +250,7 @@ struct MainView: View {
         .background(RoundedRectangle(cornerRadius: 10).fill(Color(.windowBackgroundColor)))
     }
 
-    // MARK: - 中列：裁剪预览
+    // MARK: - Middle Column: Crop Preview
     @ViewBuilder
     private func cropPreviewPanel() -> some View {
         if let image = previewImage {
@@ -192,17 +267,18 @@ struct MainView: View {
         } else {
             Text(LocalizedStrings.current.previewPrompt)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color(.windowBackgroundColor))
+                .background(RoundedRectangle(cornerRadius: 10).fill(Color(.windowBackgroundColor)))
         }
     }
 
-    // MARK: - 右列：过渡设置
+    // MARK: - Right Column: Transition Settings
     @ViewBuilder
     private func transitionSettingsPanel() -> some View {
         TransitionSettingsView(
             transitionType: $selectedTransitionType,
             transitionDuration: $transitionDuration,
-            hasSelectedFile: selectedMediaURL != nil,
+            hasSelectedFile: hasSelectedWallpaper,
+            isBuiltInWallpaper: selectedSystemWallpaper != nil,
             videoFirstFrame: self.firstFrame,  
             videoLastFrame: self.lastFrame
         ) { 
@@ -212,7 +288,7 @@ struct MainView: View {
         .background(RoundedRectangle(cornerRadius: 10).fill(Color(.windowBackgroundColor)))
     }
 
-    // MARK: - 文件选择逻辑
+    // MARK: - File Selection Logic
     private func selectFile() {
         let panel = NSOpenPanel()
         panel.allowsMultipleSelection = false
@@ -239,16 +315,19 @@ struct MainView: View {
     }
 
     private func handleFileSelection(url: URL) {
+        // Clear system wallpaper selection
+        selectedSystemWallpaper = nil
+        
         let ext = url.pathExtension.lowercased()
 
         if ["jpg", "jpeg", "png", "gif", "bmp", "tiff", "heic"].contains(ext) {
             if let image = NSImage(contentsOf: url) {
                 self.previewImage = image
                 self.firstFrame = image
-                self.lastFrame = image  // 图片的话第一帧和最后一帧是同一张
+                self.lastFrame = image  // For images, first and last frame are the same
             }
         } else if ["mp4", "mov", "avi", "m4v", "mkv"].contains(ext) {
-            // 提取视频的第一帧和最后一帧
+            // Extract first and last frames from video
             extractVideoFrames(from: url)
         }
 
@@ -275,7 +354,6 @@ struct MainView: View {
             let cgImage = try generator.copyCGImage(at: .zero, actualTime: nil)
             return NSImage(cgImage: cgImage, size: .zero)
         } catch {
-            print("❌ 缩略图失败: \(error)")
             return nil
         }
     }
@@ -287,9 +365,9 @@ struct MainView: View {
         generator.requestedTimeToleranceAfter = .zero
         generator.requestedTimeToleranceBefore = .zero
         
-        // 异步提取帧，避免阻塞UI
+        // Extract frames asynchronously to avoid blocking UI
         DispatchQueue.global(qos: .userInitiated).async {
-            // 先获取视频时长
+            // First get video duration
             asset.loadValuesAsynchronously(forKeys: ["duration"]) {
                 var error: NSError?
                 let status = asset.statusOfValue(forKey: "duration", error: &error)
@@ -298,9 +376,9 @@ struct MainView: View {
                     let duration = asset.duration
                     let durationSeconds = CMTimeGetSeconds(duration)
                     
-                    // 提取第一帧（0秒）
+                    // Extract first frame (0 seconds)
                     let firstFrameTime = CMTime.zero
-                    // 提取最后一帧（视频结束前0.1秒，避免黑帧）
+                    // Extract last frame (0.1 seconds before end to avoid black frames)
                     let lastFrameTime = CMTime(seconds: max(0, durationSeconds - 0.1), preferredTimescale: 600)
                     
                     let times = [NSValue(time: firstFrameTime), NSValue(time: lastFrameTime)]
@@ -314,31 +392,28 @@ struct MainView: View {
                             
                             DispatchQueue.main.async {
                                 if CMTimeCompare(requestedTime, firstFrameTime) == 0 {
-                                    // 这是第一帧
+                                    // This is the first frame
                                     self.firstFrame = nsImage
-                                    self.previewImage = nsImage  // 也用作主预览图
+                                    self.previewImage = nsImage  // Also use as main preview
                                 } else {
-                                    // 这是最后一帧
+                                    // This is the last frame
                                     self.lastFrame = nsImage
                                 }
                                 
-                                // 当两帧都提取完成时更新状态
+                                // Update status when both frames are extracted
                                 if self.firstFrame != nil && self.lastFrame != nil {
                                     self.statusMessage = LocalizedStrings.current.videoSelected
                                 }
                             }
-                        } else if let error = error {
-                            print("❌ 提取视频帧失败: \(error)")
+                        } else {
                             DispatchQueue.main.async {
                                 self.statusMessage = LocalizedStrings.current.frameExtractionFailed
                             }
                         }
                     }
                 } else {
-                    print("❌ 无法获取视频时长: \(error?.localizedDescription ?? "未知错误")")
                     DispatchQueue.main.async {
                         self.statusMessage = LocalizedStrings.current.videoAnalysisFailed
-                        // 降级到只提取第一帧
                         if let thumbnail = self.generateThumbnail(from: url) {
                             self.firstFrame = thumbnail
                             self.lastFrame = thumbnail
@@ -351,6 +426,7 @@ struct MainView: View {
     }
 
     private func applyWallpaper() {
+        // Handle user-selected files (including converted system wallpapers)
         guard let url = selectedMediaURL else {
             statusMessage = LocalizedStrings.current.pleaseSelectFile
             return
@@ -385,14 +461,25 @@ struct MainView: View {
             }
         }
     }
+    
 
-    private func handleBuiltInWallpaperVideo(name: String) {
-        guard let url = Bundle.main.url(forResource: name, withExtension: "mp4") else {
-            statusMessage = "找不到内置视频 \(name).mp4"
-            return
+    
+    private func handleSystemWallpaperSelection(_ wallpaper: SystemWallpaper) {
+        selectedSystemWallpaper = nil
+        
+        let fileURL: URL
+        if wallpaper.isDynamic, let videoPath = wallpaper.videoPath {
+            fileURL = URL(fileURLWithPath: videoPath)
+        } else {
+            fileURL = URL(fileURLWithPath: wallpaper.fullResolutionPath)
         }
-
-        selectedMediaURL = url
-        handleFileSelection(url: url)
+        
+        selectedMediaURL = fileURL
+        handleFileSelection(url: fileURL)
+        statusMessage = "\(LocalizedStrings.current.imageSelected): \(wallpaper.displayName)"
     }
+
+    
+
+
 }

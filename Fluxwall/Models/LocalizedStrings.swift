@@ -65,6 +65,7 @@ struct LocalizedStrings {
     let lastFrame: String
     
     // 过渡类型
+    let transitionNone: String
     let transitionFade: String
     let transitionBlackout: String
     let transitionSlideLeft: String
@@ -80,6 +81,20 @@ struct LocalizedStrings {
     // 过渡预览
     let effectPreview: String
     let applied: String
+    
+    // 内置壁纸
+    let builtInWallpapers: String
+    let customWallpaper: String
+    let staticWallpapers: String
+    let dynamicWallpapers: String
+    let lightWallpapers: String
+    let darkWallpapers: String
+    let abstractWallpapers: String
+    let natureWallpapers: String
+    let previewAdjustment: String
+    let staticWallpaperDescription: String
+    let dynamicWallpaperDescription: String
+    let refresh: String
     
     static func forLanguage(_ language: SupportedLanguage) -> LocalizedStrings {
         switch language {
@@ -138,6 +153,7 @@ struct LocalizedStrings {
                 firstFrame: "第一帧",
                 lastFrame: "最后一帧",
                 
+                transitionNone: "无效果",
                 transitionFade: "淡入淡出",
                 transitionBlackout: "黑幕过渡",
                 transitionSlideLeft: "左滑",
@@ -150,7 +166,20 @@ struct LocalizedStrings {
                 reset: "还原",
                 
                 effectPreview: "效果预览",
-                applied: "已应用"
+                applied: "已应用",
+                
+                builtInWallpapers: "内置壁纸",
+                customWallpaper: "自定义壁纸",
+                staticWallpapers: "静态壁纸",
+                dynamicWallpapers: "动态壁纸",
+                lightWallpapers: "浅色壁纸",
+                darkWallpapers: "深色壁纸",
+                abstractWallpapers: "抽象壁纸",
+                natureWallpapers: "自然壁纸",
+                previewAdjustment: "预览调整",
+                staticWallpaperDescription: "静态壁纸将直接应用到桌面",
+                dynamicWallpaperDescription: "动态壁纸会根据时间自动变化",
+                refresh: "刷新"
             )
             
         case .english:
@@ -208,6 +237,7 @@ struct LocalizedStrings {
                 firstFrame: "First Frame",
                 lastFrame: "Last Frame",
                 
+                transitionNone: "None",
                 transitionFade: "Fade",
                 transitionBlackout: "Blackout",
                 transitionSlideLeft: "Slide Left",
@@ -220,7 +250,20 @@ struct LocalizedStrings {
                 reset: "Reset",
                 
                 effectPreview: "Effect Preview",
-                applied: "Applied"
+                applied: "Applied",
+                
+                builtInWallpapers: "Built-in Wallpapers",
+                customWallpaper: "Custom Wallpaper",
+                staticWallpapers: "Static",
+                dynamicWallpapers: "Dynamic",
+                lightWallpapers: "Light",
+                darkWallpapers: "Dark",
+                abstractWallpapers: "Abstract",
+                natureWallpapers: "Nature",
+                previewAdjustment: "Preview & Adjustment",
+                staticWallpaperDescription: "Static wallpapers will be applied directly to desktop",
+                dynamicWallpaperDescription: "Dynamic wallpapers change automatically based on time",
+                refresh: "Refresh"
             )
         }
     }

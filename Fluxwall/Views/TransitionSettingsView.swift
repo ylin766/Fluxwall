@@ -5,6 +5,7 @@ struct TransitionSettingsView: View {
     @Binding var transitionDuration: Double
     
     var hasSelectedFile: Bool
+    var isBuiltInWallpaper: Bool = false
     var firstFrame: NSImage?
     var lastFrame: NSImage?
     var onApplyWallpaper: (() -> Void)?
@@ -17,6 +18,7 @@ struct TransitionSettingsView: View {
         transitionType: Binding<TransitionType>,
         transitionDuration: Binding<Double>,
         hasSelectedFile: Bool,
+        isBuiltInWallpaper: Bool = false,
         videoFirstFrame: NSImage? = nil,
         videoLastFrame: NSImage? = nil,
         onApplyWallpaper: (() -> Void)? = nil
@@ -24,6 +26,7 @@ struct TransitionSettingsView: View {
         self._transitionType = transitionType
         self._transitionDuration = transitionDuration
         self.hasSelectedFile = hasSelectedFile
+        self.isBuiltInWallpaper = isBuiltInWallpaper
         self.firstFrame = videoFirstFrame
         self.lastFrame = videoLastFrame
         self.onApplyWallpaper = onApplyWallpaper
@@ -41,15 +44,21 @@ struct TransitionSettingsView: View {
                 
                 HStack(spacing: 8) {
                     TransitionTypeButton(
-                        type: .fade,
+                        type: .none,
                         selectedType: $transitionType,
                         isEnabled: hasSelectedFile
                     )
                     
                     TransitionTypeButton(
+                        type: .fade,
+                        selectedType: $transitionType,
+                        isEnabled: hasSelectedFile && !isBuiltInWallpaper
+                    )
+                    
+                    TransitionTypeButton(
                         type: .blackout,
                         selectedType: $transitionType,
-                        isEnabled: hasSelectedFile
+                        isEnabled: hasSelectedFile && !isBuiltInWallpaper
                     )
                 }
             }
@@ -73,7 +82,6 @@ struct TransitionSettingsView: View {
             .padding(.horizontal, 4)
             .padding(.vertical, 3)
             
-            // 过渡效果预览 - 移到duration下面
             if hasSelectedFile {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(LocalizedStrings.current.effectPreview)
@@ -96,7 +104,6 @@ struct TransitionSettingsView: View {
                 .padding(.top, 6)
             }
             
-            // Apply Wallpaper 按钮移到最下面
             Button(action: {
                 onApplyWallpaper?()
             }) {
@@ -126,40 +133,40 @@ struct TransitionSettingsView: View {
         .onDisappear {
             stopPreview()
         }
+        .onChange(of: isBuiltInWallpaper) { newValue in
+            if newValue {
+                transitionType = .none
+            }
+        }
     }
     
-    // 开始预览动画 - 只播放一次
     private func startPreview() {
-        // 如果正在播放，先停止
         stopPreview()
         
         isPreviewPlaying = true
         previewProgress = 0.0
         
-        // 根据实际过渡时长计算更新间隔
         let updateInterval = 0.05
         let progressIncrement = updateInterval / transitionDuration
         
-        // 创建定时器来更新预览进度
         previewTimer = Timer.scheduledTimer(withTimeInterval: updateInterval, repeats: true) { _ in
             if previewProgress < 1.0 {
                 previewProgress += progressIncrement
             } else {
-                // 播放完成，停止播放
                 stopPreview()
             }
         }
     }
     
-    // 停止预览动画
     private func stopPreview() {
         isPreviewPlaying = false
         previewTimer?.invalidate()
         previewTimer = nil
     }
+    
+
 }
 
-// 过渡类型按钮
 struct TransitionTypeButton: View {
     let type: TransitionType
     @Binding var selectedType: TransitionType
@@ -194,7 +201,23 @@ struct TransitionTypeButton: View {
                         .animation(.easeInOut(duration: 0.1), value: isPressed)
                     
                     // 过渡效果示意图 - 紧凑化
-                    if type == .fade {
+                    if type == .none {
+                        // 无过渡效果 - 显示两个分离的矩形表示瞬间切换
+                        HStack(spacing: 4) {
+                            Rectangle()
+                                .fill(Color.blue.opacity(0.7))
+                                .frame(width: 22, height: 25)
+                            
+                            // 中间的分割线表示瞬间切换
+                            Rectangle()
+                                .fill(Color.white)
+                                .frame(width: 2, height: 25)
+                            
+                            Rectangle()
+                                .fill(Color.green.opacity(0.7))
+                                .frame(width: 22, height: 25)
+                        }
+                    } else if type == .fade {
                         HStack(spacing: 0) {
                             Rectangle()
                                 .fill(Color.blue.opacity(0.7))
@@ -254,6 +277,8 @@ struct TransitionTypeButton: View {
     
     private func getTransitionTypeName(_ type: TransitionType) -> String {
         switch type {
+        case .none:
+            return LocalizedStrings.current.transitionNone
         case .fade:
             return LocalizedStrings.current.transitionFade
         case .blackout:
@@ -290,6 +315,8 @@ struct TransitionEffectPreview: View {
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .opacity(calculateFirstFrameOpacity())
+                        .offset(calculateFirstFrameOffset())
+                        .scaleEffect(calculateFirstFrameScale())
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                     
                     // 最后一帧（结束状态）- 如果有的话
@@ -298,6 +325,8 @@ struct TransitionEffectPreview: View {
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                             .opacity(calculateLastFrameOpacity())
+                            .offset(calculateLastFrameOffset())
+                            .scaleEffect(calculateLastFrameScale())
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                     
@@ -356,6 +385,8 @@ struct TransitionEffectPreview: View {
     
     private func calculateFirstFrameOpacity() -> Double {
         switch transitionType {
+        case .none:
+            return 1.0  // 无效果时始终显示第一帧
         case .fade:
             return 1.0 - progress
         case .blackout:
@@ -369,6 +400,8 @@ struct TransitionEffectPreview: View {
     
     private func calculateLastFrameOpacity() -> Double {
         switch transitionType {
+        case .none:
+            return 0.0  // 无效果时不显示第二帧
         case .fade:
             return progress
         case .blackout:
@@ -391,6 +424,22 @@ struct TransitionEffectPreview: View {
         }
         return 0.0
     }
+    
+    private func calculateFirstFrameOffset() -> CGSize {
+        return CGSize.zero
+    }
+    
+    private func calculateLastFrameOffset() -> CGSize {
+        return CGSize.zero
+    }
+    
+    private func calculateFirstFrameScale() -> Double {
+        return 1.0
+    }
+    
+    private func calculateLastFrameScale() -> Double {
+        return 1.0
+    }
 }
 
 #Preview {
@@ -398,6 +447,7 @@ struct TransitionEffectPreview: View {
         transitionType: .constant(.fade),
         transitionDuration: .constant(1.0),
         hasSelectedFile: true,
+        isBuiltInWallpaper: false,
         onApplyWallpaper: { print("预览中点击了应用壁纸") }
     )
     .frame(width: 300, height: 400)
