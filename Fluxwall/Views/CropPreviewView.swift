@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct CropPreviewView: View {
-    let displaySize: CGSize                         // 显示器分辨率
-    let previewImage: NSImage                       // 生成的缩略图
+    let displaySize: CGSize                         // Display resolution
+    let previewImage: NSImage                       // Generated thumbnail
     
-    @Binding var scale: CGFloat                     // 缩放倍率
-    @Binding var offset: CGSize                     // 拖动偏移
+    @Binding var scale: CGFloat                     // Scale factor
+    @Binding var offset: CGSize                     // Drag offset
     var onScaleChanged: ((CGFloat) -> Void)? = nil
     var onOffsetChanged: ((CGSize) -> Void)? = nil
 
@@ -14,7 +14,7 @@ struct CropPreviewView: View {
 
     var body: some View {
         VStack(spacing: 12) {
-            // 屏幕模拟器 + 缩略图预览
+            // Screen simulator + thumbnail preview
             ComputerFrameView(displaySize: displaySize) {
                 GeometryReader { previewGeometry in
                     CropPreviewImage(
@@ -29,16 +29,16 @@ struct CropPreviewView: View {
                                 state = value.translation
                             }
                             .onEnded { value in
-                                // 相对位置映射：预览窗口已经按实际显示器比例设计
-                                // 所以我们直接使用预览容器中的拖拽距离作为相对偏移
-                                // 然后按比例映射到实际显示器尺寸
+                                // Relative position mapping: preview window is designed according to actual display ratio
+                                // So we directly use the drag distance in preview container as relative offset
+                                // Then map proportionally to actual display size
                                 let previewSize = previewGeometry.size
                                 
-                                // 计算相对偏移（百分比）
+                                // Calculate relative offset (percentage)
                                 let relativeOffsetX = value.translation.width / previewSize.width
                                 let relativeOffsetY = value.translation.height / previewSize.height
                                 
-                                // 将相对偏移应用到实际显示器尺寸
+                                // Apply relative offset to actual display size
                                 let actualOffsetX = relativeOffsetX * displaySize.width
                                 let actualOffsetY = relativeOffsetY * displaySize.height
                                 
@@ -52,14 +52,14 @@ struct CropPreviewView: View {
                             }
                     )
                     .onChange(of: dragOffset) { newDrag in
-                        // 实时预览时使用相同的相对位置映射
+                        // Use the same relative position mapping for real-time preview
                         let previewSize = previewGeometry.size
                         
-                        // 计算相对偏移（百分比）
+                        // Calculate relative offset (percentage)
                         let relativeOffsetX = newDrag.width / previewSize.width
                         let relativeOffsetY = newDrag.height / previewSize.height
                         
-                        // 将相对偏移应用到实际显示器尺寸
+                        // Apply relative offset to actual display size
                         let actualOffsetX = relativeOffsetX * displaySize.width
                         let actualOffsetY = relativeOffsetY * displaySize.height
                         
@@ -72,7 +72,7 @@ struct CropPreviewView: View {
             }
             .frame(height: 260)
 
-            // 缩放控制滑块 + 重置按钮
+            // Scale control slider + reset button
             VStack(spacing: 4) {
                 HStack {
                     Text("\(LocalizedStrings.current.scale): \(String(format: "%.2f×", scale))")
@@ -90,9 +90,10 @@ struct CropPreviewView: View {
                             .font(.system(size: 11, weight: .medium))
                             .padding(.horizontal, 10)
                             .padding(.vertical, 4)
-                            .background(
-                                RoundedRectangle(cornerRadius: 6)
-                                    .fill(Color(NSColor.controlBackgroundColor))
+                            .glassCard(
+                                cornerRadius: 6,
+                                shadowStyle: ModernDesignSystem.Shadow.minimal,
+                                glassIntensity: 0.8
                             )
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -115,10 +116,9 @@ struct CropPreviewView: View {
 
         }
         .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color(.windowBackgroundColor))
-                .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
+        .glassCard(
+            cornerRadius: 10,
+            shadowStyle: ModernDesignSystem.Shadow.minimal
         )
     }
 }

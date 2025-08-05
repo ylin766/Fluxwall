@@ -6,7 +6,7 @@ struct SettingsView: View {
     
     var body: some View {
         VStack(spacing: 20) {
-            // 标题
+            // Title
             HStack {
                 Text(LocalizedStrings.current.languageSettings)
                     .font(.system(size: 18, weight: .semibold))
@@ -25,7 +25,7 @@ struct SettingsView: View {
             
             Divider()
             
-            // 语言选择
+            // Language selection
             VStack(alignment: .leading, spacing: 12) {
                 Text(LocalizedStrings.current.languageSettings)
                     .font(.system(size: 14, weight: .medium))
@@ -51,10 +51,11 @@ struct SettingsView: View {
                             }
                             .padding(.horizontal, 16)
                             .padding(.vertical, 10)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(languageSettings.currentLanguage == language ? 
-                                          Color.blue.opacity(0.1) : Color(.controlBackgroundColor))
+                            .flatCard(
+                                isActive: languageSettings.currentLanguage == language,
+                                cornerRadius: ModernDesignSystem.CornerRadius.medium,
+                                shadowStyle: ModernDesignSystem.Shadow.minimal,
+                                borderIntensity: languageSettings.currentLanguage == language ? 1.2 : 0.8
                             )
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
@@ -71,7 +72,7 @@ struct SettingsView: View {
             Spacer()
         }
         .frame(width: 300, height: 200)
-        .background(Color(.windowBackgroundColor))
+        .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.extraLarge, shadowStyle: ModernDesignSystem.Shadow.light)
     }
 }
 

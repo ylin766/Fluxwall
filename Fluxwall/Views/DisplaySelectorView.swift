@@ -60,14 +60,14 @@ struct DisplaySelectorView: View {
     }
     
     private func loadDisplays() {
-        // 获取所有连接的显示器
+        // Get all connected displays
         var displayIDs: [CGDirectDisplayID] = []
         var displayCount: UInt32 = 0
         
         if CGGetActiveDisplayList(0, nil, &displayCount) == .success {
             displayIDs = [CGDirectDisplayID](repeating: 0, count: Int(displayCount))
             if CGGetActiveDisplayList(displayCount, &displayIDs, &displayCount) == .success {
-                // 处理每个显示器
+                // Process each display
                 var displayInfos: [DisplayInfo] = []
                 
                 for displayID in displayIDs {
@@ -75,10 +75,10 @@ struct DisplaySelectorView: View {
                     let height = CGDisplayPixelsHigh(displayID)
                     let isMain = CGDisplayIsMain(displayID) != 0
                     
-                    // 获取显示器真实名称
+                    // Get display real name
                     let name = getDisplayName(for: displayID, isMain: isMain)
                     
-                    // 创建显示器缩略图
+                    // Create display thumbnail
                     let thumbnail = createDisplayThumbnail(displayID: displayID)
                     
                     let displayInfo = DisplayInfo(
@@ -92,13 +92,13 @@ struct DisplaySelectorView: View {
                     displayInfos.append(displayInfo)
                 }
                 
-                // 主显示器排在前面
+                // Main display comes first
                 displayInfos.sort { $0.isMain && !$1.isMain }
                 
-                // 更新状态
+                // Update state
                 self.displays = displayInfos
                 
-                // 默认选择主显示器
+                // Select main display by default
                 if let mainDisplay = displayInfos.first(where: { $0.isMain }) {
                     self.selectedDisplayID = mainDisplay.id
                     self.onDisplaySelected?(mainDisplay.id)
@@ -111,16 +111,16 @@ struct DisplaySelectorView: View {
     }
     
     private func getDisplayName(for displayID: CGDirectDisplayID, isMain: Bool) -> String {
-        // 尝试获取显示器的真实名称
+        // Try to get the real name of the display
         if let displayName = getDisplayNameFromIOKit(displayID: displayID) {
-            // 清理显示器名称，移除不必要的后缀
+            // Clean display name, remove unnecessary suffixes
             let cleanedName = cleanDisplayName(displayName)
             
-            // 如果是主显示器，在名称后加上标识
+            // If it's main display, add identifier to name
             return isMain ? "\(cleanedName) (\(LocalizedStrings.current.mainDisplay))" : cleanedName
         }
         
-        // 如果无法获取真实名称，使用备用方案
+        // If unable to get real name, use fallback
         return isMain ? LocalizedStrings.current.mainDisplay : "\(LocalizedStrings.current.display) \(displayID)"
     }
     
@@ -314,13 +314,11 @@ struct DisplayCard: View {
         }
         .padding(6)
         .frame(width: 100)
-        .background(
-            RoundedRectangle(cornerRadius: 6)
-                .fill(isSelected ? Color.blue.opacity(0.1) : Color.clear)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 6)
-                        .stroke(isSelected ? Color.blue : Color.gray.opacity(0.3), lineWidth: 1.5)
-                )
+        .glassCard(
+            isActive: isSelected,
+            cornerRadius: 6,
+            shadowStyle: ModernDesignSystem.Shadow.minimal,
+            glassIntensity: isSelected ? 1.0 : 0.6
         )
     }
 }

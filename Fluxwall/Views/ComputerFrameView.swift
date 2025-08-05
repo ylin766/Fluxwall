@@ -16,20 +16,20 @@ struct ComputerFrameView<Content: View>: View {
             let aspectRatio = displaySize.width / displaySize.height
             let screenHeight = maxWidth / aspectRatio
             let screenSize = CGSize(width: maxWidth, height: screenHeight)
-            let outerHeight = screenHeight + 80 // 增加壳体下边距
+            let outerHeight = screenHeight + 80 // Add bottom margin for shell
 
             VStack(spacing: 0) {
                 ZStack(alignment: .top) {
-                    // ✅ 外层壳体
+                    // Outer shell
                     RoundedRectangle(cornerRadius: 24)
                         .fill(Color.gray.opacity(0.15))
                         .frame(width: screenSize.width + 32, height: outerHeight)
                         .shadow(radius: 6)
 
                     VStack(spacing: 0) {
-                        Spacer(minLength: 20) // ✅ 内容上方留白
+                        Spacer(minLength: 20) // Top spacing for content
 
-                        // ✅ 内容区域
+                        // Content area
                         ZStack {
                                 content()
                                     .frame(width: screenSize.width, height: screenSize.height)
@@ -45,7 +45,7 @@ struct ComputerFrameView<Content: View>: View {
 
                         Spacer(minLength: 12)
 
-                        // ✅ logo 放大并靠近底部
+                        // Logo enlarged and near bottom
                         Text("")
                             .font(.system(size: 36, weight: .medium))
                             .foregroundColor(.gray)

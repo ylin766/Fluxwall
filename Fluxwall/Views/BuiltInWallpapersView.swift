@@ -49,13 +49,14 @@ struct BuiltInWallpapersView: View {
                 }) {
                     Text(category.localizedName)
                         .font(.system(size: 12, weight: .medium))
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(
-                        RoundedRectangle(cornerRadius: 6)
-                            .fill(selectedCategory == category ? Color.blue : Color(.controlBackgroundColor))
-                    )
-                    .foregroundColor(selectedCategory == category ? .white : .primary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .foregroundColor(selectedCategory == category ? .white : .primary)
+                        .flatButton(
+                            isSelected: selectedCategory == category,
+                            cornerRadius: ModernDesignSystem.CornerRadius.small,
+                            borderIntensity: selectedCategory == category ? 1.0 : 0.6
+                        )
                 }
                 .buttonStyle(PlainButtonStyle())
             }

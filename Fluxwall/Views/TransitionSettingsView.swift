@@ -119,9 +119,11 @@ struct TransitionSettingsView: View {
                 .padding(.vertical, 10)
             }
             .buttonStyle(BorderlessButtonStyle())
-            .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(hasSelectedFile ? Color.blue : Color.gray.opacity(0.5))
+            .glassCard(
+                isActive: hasSelectedFile,
+                cornerRadius: 8,
+                shadowStyle: hasSelectedFile ? ModernDesignSystem.Shadow.light : ModernDesignSystem.Shadow.minimal,
+                glassIntensity: hasSelectedFile ? 1.2 : 0.6
             )
             .foregroundColor(.white)
             .disabled(!hasSelectedFile)
@@ -176,14 +178,14 @@ struct TransitionTypeButton: View {
     var body: some View {
         Button(action: {
             if isEnabled {
-                // 添加触觉反馈
+                // Add haptic feedback
                 withAnimation(.easeInOut(duration: 0.1)) {
                     isPressed = true
                 }
                 
                 selectedType = type
                 
-                // 重置按压状态
+                // Reset pressed state
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     withAnimation(.easeInOut(duration: 0.1)) {
                         isPressed = false
@@ -192,7 +194,7 @@ struct TransitionTypeButton: View {
             }
         }) {
             VStack(spacing: 4) {
-                // 图标 - 紧凑化，添加动画
+                // Icon - compact with animation
                 ZStack {
                     RoundedRectangle(cornerRadius: 6)
                         .fill(selectedType == type ? Color.blue.opacity(0.2) : Color(.controlBackgroundColor))
@@ -200,15 +202,15 @@ struct TransitionTypeButton: View {
                         .scaleEffect(isPressed ? 0.95 : 1.0)
                         .animation(.easeInOut(duration: 0.1), value: isPressed)
                     
-                    // 过渡效果示意图 - 紧凑化
+                    // Transition effect diagram - compact
                     if type == .none {
-                        // 无过渡效果 - 显示两个分离的矩形表示瞬间切换
+                        // No transition - show two separate rectangles for instant switch
                         HStack(spacing: 4) {
                             Rectangle()
                                 .fill(Color.blue.opacity(0.7))
                                 .frame(width: 22, height: 25)
                             
-                            // 中间的分割线表示瞬间切换
+                            // Middle divider for instant switch
                             Rectangle()
                                 .fill(Color.white)
                                 .frame(width: 2, height: 25)
@@ -263,7 +265,7 @@ struct TransitionTypeButton: View {
                         .animation(.easeInOut(duration: 0.2), value: selectedType == type)
                 )
                 
-                // 文本 - 紧凑化
+                // Text - compact
                 Text(getTransitionTypeName(type))
                     .font(.system(size: 10))
                     .foregroundColor(isEnabled ? .primary : .secondary)

@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-// 支持的语言枚举
+// Supported language enumeration
 enum SupportedLanguage: String, CaseIterable {
     case chinese = "zh-Hans"
     case english = "en"
@@ -9,7 +9,7 @@ enum SupportedLanguage: String, CaseIterable {
     var displayName: String {
         switch self {
         case .chinese:
-            return "中文"
+            return "简体中文"
         case .english:
             return "English"
         }
@@ -25,7 +25,7 @@ enum SupportedLanguage: String, CaseIterable {
     }
 }
 
-// 语言设置管理器
+// Language settings manager
 class LanguageSettings: ObservableObject {
     static let shared = LanguageSettings()
     
@@ -37,7 +37,7 @@ class LanguageSettings: ObservableObject {
     }
     
     private init() {
-        // 从UserDefaults读取保存的语言设置，默认为中文
+        // Read saved language settings from UserDefaults, default to Chinese
         let savedLanguage = UserDefaults.standard.string(forKey: "selectedLanguage") ?? SupportedLanguage.chinese.rawValue
         self.currentLanguage = SupportedLanguage(rawValue: savedLanguage) ?? .chinese
         updateLocalizedStrings()

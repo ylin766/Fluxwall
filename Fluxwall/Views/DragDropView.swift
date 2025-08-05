@@ -8,13 +8,13 @@
 import SwiftUI
 import AppKit
 
-// 支持拖拽的NSView
+// NSView that supports drag and drop functionality
 class DragDropView: NSView {
     
-    // 拖拽回调
+    // Callback for dropped files
     var onFilesDropped: (([URL]) -> Void)?
     
-    // 视觉状态
+    // Visual state tracking
     private var isDragOver = false
     
     override func awakeFromNib() {
@@ -33,10 +33,10 @@ class DragDropView: NSView {
     }
     
     private func setupDragAndDrop() {
-        // 注册拖拽类型
+        // Register drag types
         registerForDraggedTypes([.fileURL])
         
-        // 设置视图属性
+        // Setup view properties
         wantsLayer = true
         layer?.cornerRadius = 12
         updateAppearance()
@@ -44,23 +44,23 @@ class DragDropView: NSView {
     
     private func updateAppearance() {
         if isDragOver {
-            // 高亮状态 - 蓝色边框和淡蓝色背景
+            // Highlight state - blue border and light blue background
             layer?.backgroundColor = NSColor.systemBlue.withAlphaComponent(0.15).cgColor
             layer?.borderColor = NSColor.systemBlue.cgColor
             layer?.borderWidth = 3
             
-            // 添加阴影效果
+            // Add shadow effect
             layer?.shadowOpacity = 0.3
             layer?.shadowRadius = 5
             layer?.shadowOffset = CGSize(width: 0, height: 2)
             layer?.shadowColor = NSColor.black.cgColor
         } else {
-            // 正常状态 - 淡灰色边框和透明背景
+            // Normal state - light gray border and transparent background
             layer?.backgroundColor = NSColor.controlBackgroundColor.cgColor
             layer?.borderColor = NSColor.separatorColor.cgColor
             layer?.borderWidth = 2
             
-            // 轻微阴影
+            // Light shadow
             layer?.shadowOpacity = 0.1
             layer?.shadowRadius = 3
             layer?.shadowOffset = CGSize(width: 0, height: 1)
@@ -68,15 +68,15 @@ class DragDropView: NSView {
         }
     }
     
-    // MARK: - 拖拽处理
+    // MARK: - Drag and Drop Handling
     
     override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
-        // 检查是否包含文件URL
+        // Check if contains file URLs
         guard sender.draggingPasteboard.canReadObject(forClasses: [NSURL.self], options: nil) else {
             return []
         }
         
-        // 检查文件类型
+        // Check file types
         if let urls = sender.draggingPasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL] {
             let supportedExtensions = ["mp4", "mov", "avi", "m4v", "mkv", "jpg", "jpeg", "png", "gif", "bmp", "tiff"]
             
@@ -107,14 +107,14 @@ class DragDropView: NSView {
             return false
         }
         
-        // 过滤支持的文件类型
+        // Filter supported file types
         let supportedExtensions = ["mp4", "mov", "avi", "m4v", "mkv", "jpg", "jpeg", "png", "gif", "bmp", "tiff"]
         let validUrls = urls.filter { url in
             supportedExtensions.contains(url.pathExtension.lowercased())
         }
         
         if !validUrls.isEmpty {
-            // 添加一个简单的动画效果
+            // Add simple animation effect
             if let layer = self.layer {
                 let animation = CABasicAnimation(keyPath: "backgroundColor")
                 animation.fromValue = layer.backgroundColor
@@ -129,7 +129,7 @@ class DragDropView: NSView {
             }
 
             
-            // 调用回调
+            // Call callback
             onFilesDropped?(validUrls)
             return true
         }
@@ -143,7 +143,7 @@ class DragDropView: NSView {
     }
 }
 
-// SwiftUI 包装器
+// SwiftUI wrapper
 struct DragDropArea: NSViewRepresentable {
     var onFilesDropped: ([URL]) -> Void
     

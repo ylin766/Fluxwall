@@ -74,7 +74,19 @@ struct MainView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
+        ZStack {
+            // Modern gradient background
+            LinearGradient(
+                colors: [
+                    Color(red: 0.05, green: 0.05, blue: 0.08),
+                    Color(red: 0.08, green: 0.08, blue: 0.12)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
             // Title and settings button
             ZStack {
                 // Centered title
@@ -136,7 +148,7 @@ struct MainView: View {
                             }
                         }
                         .padding(12)
-                        .background(RoundedRectangle(cornerRadius: 10).fill(Color(.windowBackgroundColor)))
+                        .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
                         .frame(maxHeight: .infinity)
                         
                         // Bottom half: crop preview area
@@ -153,6 +165,7 @@ struct MainView: View {
             }
 
             Spacer(minLength: 0)
+            }
         }
         .frame(width: 1000, height: 650)
         .onAppear {
@@ -180,7 +193,7 @@ struct MainView: View {
                 }
             }
             .frame(height: 100)
-            .background(RoundedRectangle(cornerRadius: 10).fill(Color(.controlBackgroundColor)))
+            .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
             .overlay(
                 VStack(spacing: 6) {
                     Image(systemName: "arrow.down.doc.fill")
@@ -231,13 +244,13 @@ struct MainView: View {
                 .padding(.vertical, 6)
             }
             .buttonStyle(BorderlessButtonStyle())
-            .background(RoundedRectangle(cornerRadius: 6).fill(Color(.controlBackgroundColor)))
+            .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.medium, shadowStyle: ModernDesignSystem.Shadow.minimal, borderIntensity: 0.8)
             .disabled(wallpaperManager.currentWallpaperName == LocalizedStrings.current.systemDefault && !wallpaperManager.isVideoActive)
 
             Spacer()
         }
         .padding(12)
-        .background(RoundedRectangle(cornerRadius: 10).fill(Color(.windowBackgroundColor)))
+        .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
     }
 
     // MARK: - Display Selection
@@ -247,7 +260,7 @@ struct MainView: View {
             selectedDisplayID = displayID
         })
         .padding(12)
-        .background(RoundedRectangle(cornerRadius: 10).fill(Color(.windowBackgroundColor)))
+        .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
     }
 
     // MARK: - Middle Column: Crop Preview
@@ -267,7 +280,7 @@ struct MainView: View {
         } else {
             Text(LocalizedStrings.current.previewPrompt)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(RoundedRectangle(cornerRadius: 10).fill(Color(.windowBackgroundColor)))
+                .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
         }
     }
 
@@ -285,7 +298,7 @@ struct MainView: View {
             applyWallpaper() 
         }
         .padding(12)
-        .background(RoundedRectangle(cornerRadius: 10).fill(Color(.windowBackgroundColor)))
+        .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
     }
 
     // MARK: - File Selection Logic

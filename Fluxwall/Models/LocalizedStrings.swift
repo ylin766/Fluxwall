@@ -1,26 +1,26 @@
 import Foundation
 
-// 本地化字符串结构
+// Localized strings structure
 struct LocalizedStrings {
     static var current = LocalizedStrings.forLanguage(.chinese)
     
-    // 应用标题和描述
+    // App title and description
     let appTitle: String
     let appSubtitle: String
     
-    // 语言设置
+    // Language settings
     let languageChinese: String
     let languageEnglish: String
     let languageSettings: String
     
-    // 文件选择
+    // File selection
     let dragFilesHere: String
     let supportedFormats: String
     let selectFile: String
     let selectWallpaper: String
     let selectWallpaperMessage: String
     
-    // 状态消息
+    // Status messages
     let ready: String
     let videoSelected: String
     let imageSelected: String
@@ -41,7 +41,7 @@ struct LocalizedStrings {
     let toSelectedDisplay: String
     let toAllDisplays: String
     
-    // 显示器选择
+    // Display selection
     let displaySelection: String
     let allDisplays: String
     let builtInDisplay: String
@@ -50,11 +50,11 @@ struct LocalizedStrings {
     let detectingDisplays: String
     let mainDisplay: String
     
-    // 预览
+    // Preview
     let previewPrompt: String
     let restoreSystemWallpaper: String
     
-    // 过渡设置
+    // Transition settings
     let transitionSettings: String
     let transitionType: String
     let transitionDuration: String
@@ -64,7 +64,7 @@ struct LocalizedStrings {
     let firstFrame: String
     let lastFrame: String
     
-    // 过渡类型
+    // Transition types
     let transitionNone: String
     let transitionFade: String
     let transitionBlackout: String
@@ -74,15 +74,15 @@ struct LocalizedStrings {
     let transitionSlideDown: String
     let transitionZoom: String
     
-    // 缩放控制
+    // Scale controls
     let scale: String
     let reset: String
     
-    // 过渡预览
+    // Transition preview
     let effectPreview: String
     let applied: String
     
-    // 内置壁纸
+    // Built-in wallpapers
     let builtInWallpapers: String
     let customWallpaper: String
     let staticWallpapers: String
