@@ -1,5 +1,85 @@
 import SwiftUI
 
+// MARK: - Animated Apply Button Component
+struct AnimatedApplyButton: View {
+    let action: () -> Void
+    let isEnabled: Bool
+    
+    @State private var isHovered = false
+    @State private var isSuccess = false
+    @State private var showSuccess = false
+    
+    var body: some View {
+        Button(action: {
+            guard isEnabled else { return }
+            
+            withAnimation(.easeInOut(duration: 0.3)) {
+                isSuccess = true
+                showSuccess = true
+            }
+            
+            action()
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    isSuccess = false
+                    showSuccess = false
+                }
+            }
+        }) {
+            HStack(spacing: 6) {
+                Image(systemName: isSuccess ? "checkmark" : "photo.on.rectangle.angled")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.white)
+                
+                Text(isSuccess ? LocalizedStrings.current.wallpaperApplied : LocalizedStrings.current.applyWallpaper)
+                    .font(.system(size: 12, weight: .medium))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .padding(.horizontal, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(
+                        LinearGradient(
+                            colors: isEnabled ? (isSuccess ? [
+                                Color.green.opacity(0.9),
+                                Color.green.opacity(0.7)
+                            ] : [
+                                Color.blue.opacity(0.9),
+                                Color.blue.opacity(0.7)
+                            ]) : [
+                                Color.gray.opacity(0.3),
+                                Color.gray.opacity(0.2)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .shadow(
+                        color: isEnabled ? (isSuccess ? Color.green.opacity(0.4) : Color.blue.opacity(0.4)) : Color.clear,
+                        radius: isHovered ? 8 : 4,
+                        x: 0,
+                        y: isHovered ? 4 : 2
+                    )
+                    .animation(.easeInOut(duration: 0.3), value: isSuccess)
+                    .animation(.easeInOut(duration: 0.2), value: isHovered)
+            )
+            .scaleEffect(isHovered && isEnabled ? 1.02 : 1.0)
+            .animation(.easeInOut(duration: 0.2), value: isHovered)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .foregroundColor(.white)
+        .disabled(!isEnabled)
+        .onHover { hovering in
+            guard isEnabled else { return }
+            withAnimation(.easeInOut(duration: 0.2)) {
+                isHovered = hovering
+            }
+        }
+    }
+}
+
 struct TransitionSettingsView: View {
     @Binding var transitionType: TransitionType
     @Binding var transitionDuration: Double
@@ -104,29 +184,12 @@ struct TransitionSettingsView: View {
                 .padding(.top, 6)
             }
             
-            Button(action: {
-                onApplyWallpaper?()
-            }) {
-                HStack(spacing: 6) {
-                    Image(systemName: "photo.on.rectangle.angled")
-                        .font(.system(size: 12))
-                        .foregroundColor(.white)
-                    
-                    Text(LocalizedStrings.current.applyWallpaper)
-                        .font(.system(size: 12, weight: .medium))
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-            }
-            .buttonStyle(BorderlessButtonStyle())
-            .glassCard(
-                isActive: hasSelectedFile,
-                cornerRadius: 8,
-                shadowStyle: hasSelectedFile ? ModernDesignSystem.Shadow.light : ModernDesignSystem.Shadow.minimal,
-                glassIntensity: hasSelectedFile ? 1.2 : 0.6
+            AnimatedApplyButton(
+                action: {
+                    onApplyWallpaper?()
+                },
+                isEnabled: hasSelectedFile
             )
-            .foregroundColor(.white)
-            .disabled(!hasSelectedFile)
             .padding(.horizontal, 4)
             .padding(.top, 8)
             

@@ -3,6 +3,77 @@ import AppKit
 import UniformTypeIdentifiers
 import AVKit
 
+// MARK: - Animated Button Component
+struct AnimatedButton: View {
+    let action: () -> Void
+    let icon: String
+    let text: String
+    let style: ButtonStyle
+    
+    @State private var isHovered = false
+    
+    enum ButtonStyle {
+        case primary
+        case secondary
+        case success
+    }
+    
+    var backgroundColor: Color {
+        switch style {
+        case .primary:
+            return .blue
+        case .secondary:
+            return Color(.controlBackgroundColor)
+        case .success:
+            return .green
+        }
+    }
+    
+    var foregroundColor: Color {
+        switch style {
+        case .primary, .success:
+            return .white
+        case .secondary:
+            return .primary
+        }
+    }
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .medium))
+                
+                Text(text)
+                    .font(.system(size: 14, weight: .medium))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(backgroundColor)
+                    .shadow(
+                        color: backgroundColor.opacity(0.3),
+                        radius: isHovered ? 6 : 3,
+                        x: 0,
+                        y: isHovered ? 3 : 2
+                    )
+                    .animation(.easeInOut(duration: 0.2), value: isHovered)
+            )
+            .scaleEffect(isHovered ? 1.02 : 1.0)
+            .animation(.easeInOut(duration: 0.2), value: isHovered)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .foregroundColor(foregroundColor)
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.2)) {
+                isHovered = hovering
+            }
+        }
+    }
+}
+
 struct RefreshButton: View {
     let action: () -> Void
     @State private var isPressed = false
@@ -120,12 +191,12 @@ struct MainView: View {
                 let columnWidth = (geometry.size.width - 80) / 3
 
                 HStack(alignment: .top, spacing: 20) {
-                    VStack(spacing: 12) {
+                    VStack(spacing: 15) {
                         displaySelectorPanel()
-                            .frame(height: 140)
+                            .frame(height: 150)
 
                         fileSelectionPanel()
-                            .frame(maxHeight: .infinity)
+                            .frame(height: 387)
                     }
                     .frame(width: columnWidth, height: availableHeight)
 
@@ -204,17 +275,12 @@ struct MainView: View {
                 }
             )
 
-            Button(action: selectFile) {
-                HStack(spacing: 6) {
-                    Image(systemName: "folder.fill").font(.system(size: 14))
-                    Text(LocalizedStrings.current.selectFile).font(.system(size: 14, weight: .medium))
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 8)
-            }
-            .buttonStyle(BorderlessButtonStyle())
-            .background(RoundedRectangle(cornerRadius: 6).fill(Color.blue))
-            .foregroundColor(.white)
+            AnimatedButton(
+                action: selectFile,
+                icon: "folder.fill",
+                text: LocalizedStrings.current.selectFile,
+                style: .primary
+            )
 
             VStack(spacing: 4) {
                 Text(statusMessage)
@@ -307,18 +373,14 @@ struct MainView: View {
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
         panel.canChooseFiles = true
-        panel.prompt = LocalizedStrings.current.selectWallpaper
-        panel.message = LocalizedStrings.current.selectWallpaperMessage
-
+        panel.level = .floating
+        
         if #available(macOS 12.0, *) {
-            panel.allowedContentTypes = [
-                .mpeg4Movie, .quickTimeMovie, .avi,
-                .jpeg, .png, .gif, .bmp, .tiff, .heic
-            ]
+            panel.allowedContentTypes = [.jpeg, .png, .heic, .mpeg4Movie, .quickTimeMovie]
         } else {
-            panel.allowedFileTypes = ["mp4", "mov", "avi", "m4v", "mkv", "jpg", "jpeg", "png", "gif", "bmp", "tiff", "heic"]
+            panel.allowedFileTypes = ["jpg", "jpeg", "png", "heic", "mp4", "mov"]
         }
-
+        
         panel.begin { response in
             if response == .OK, let url = panel.url {
                 self.selectedMediaURL = url

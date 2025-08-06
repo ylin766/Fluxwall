@@ -60,6 +60,7 @@ struct LocalizedStrings {
     let transitionDuration: String
     let seconds: String
     let applyWallpaper: String
+    let wallpaperApplied: String
     let videoPreview: String
     let firstFrame: String
     let lastFrame: String
@@ -149,6 +150,7 @@ struct LocalizedStrings {
                 transitionDuration: "过渡时长",
                 seconds: "秒",
                 applyWallpaper: "应用壁纸",
+                wallpaperApplied: "应用成功",
                 videoPreview: "视频预览",
                 firstFrame: "第一帧",
                 lastFrame: "最后一帧",
@@ -233,6 +235,7 @@ struct LocalizedStrings {
                 transitionDuration: "Transition Duration",
                 seconds: "seconds",
                 applyWallpaper: "Apply Wallpaper",
+                wallpaperApplied: "Applied Successfully",
                 videoPreview: "Video Preview",
                 firstFrame: "First Frame",
                 lastFrame: "Last Frame",
