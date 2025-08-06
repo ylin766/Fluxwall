@@ -16,7 +16,15 @@ struct ComputerFrameView<Content: View>: View {
             let aspectRatio = displaySize.width / displaySize.height
             let screenHeight = maxWidth / aspectRatio
             let screenSize = CGSize(width: maxWidth, height: screenHeight)
-            let outerHeight = screenHeight + 80 // Add bottom margin for shell
+            let bottomMargin: CGFloat = 80
+            let outerHeight = screenHeight + bottomMargin
+            
+            // Calculate logo position and size based on actual layout
+            let bottomPadding: CGFloat = 30 // Padding from frame bottom edge
+            let availableSpaceForLogo = bottomMargin - bottomPadding // Space between screen bottom and frame bottom minus padding
+            let logoHeight = availableSpaceForLogo * 0.6 // Logo takes 60% of available space
+            let spaceAboveLogo = (availableSpaceForLogo - logoHeight) / 2 // Center logo in available space
+            let spaceBelow = bottomPadding // Fixed bottom padding
 
             VStack(spacing: 0) {
                 ZStack(alignment: .top) {
@@ -31,25 +39,30 @@ struct ComputerFrameView<Content: View>: View {
 
                         // Content area
                         ZStack {
-                                content()
-                                    .frame(width: screenSize.width, height: screenSize.height)
-                                    .clipped()
-                                    .cornerRadius(10)
+                            content()
+                                .frame(width: screenSize.width, height: screenSize.height)
+                                .clipped()
+                                .cornerRadius(10)
 
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(style: StrokeStyle(lineWidth: 1, dash: [6]))
-                                    .foregroundColor(.gray.opacity(0.6))
-                                    .allowsHitTesting(false)
-                            }
-                            .frame(width: screenSize.width, height: screenSize.height)
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(style: StrokeStyle(lineWidth: 1, dash: [6]))
+                                .foregroundColor(.gray.opacity(0.6))
+                                .allowsHitTesting(false)
+                        }
+                        .frame(width: screenSize.width, height: screenSize.height)
 
-                        Spacer(minLength: 12)
+                        // Fixed spacing above logo
+                        Spacer()
+                            .frame(height: spaceAboveLogo)
 
-                        // Logo enlarged and near bottom
-                        Text("")
-                            .font(.system(size: 36, weight: .medium))
-                            .foregroundColor(.gray)
-                            .padding(.bottom, 30)
+                        // Apple logo with calculated size positioned in center of remaining space
+                        Image(systemName: "applelogo")
+                            .font(.system(size: logoHeight * 0.8, weight: .medium))
+                            .foregroundColor(.gray.opacity(0.7))
+                        
+                        // Fixed spacing below logo to ensure bottom padding
+                        Spacer()
+                            .frame(height: spaceBelow)
                     }
                 }
                 .frame(maxWidth: .infinity)

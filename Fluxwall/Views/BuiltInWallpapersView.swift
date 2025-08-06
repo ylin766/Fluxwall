@@ -45,20 +45,26 @@ struct BuiltInWallpapersView: View {
         HStack(spacing: 8) {
             ForEach(WallpaperDisplayCategory.allCases, id: \.self) { category in
                 Button(action: {
-                    selectedCategory = category
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                        selectedCategory = category
+                    }
                 }) {
-                    Text(category.localizedName)
-                        .font(.system(size: 12, weight: .medium))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .foregroundColor(selectedCategory == category ? .white : .primary)
-                        .flatButton(
-                            isSelected: selectedCategory == category,
-                            cornerRadius: ModernDesignSystem.CornerRadius.small,
-                            borderIntensity: selectedCategory == category ? 1.0 : 0.6
-                        )
+                    HStack(spacing: 4) {
+                        Image(systemName: category == .dynamic ? "play.circle.fill" : "photo.fill")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(selectedCategory == category ? .white : .primary)
+                        
+                        Text(category.localizedName)
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(selectedCategory == category ? .white : .primary)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
                 }
-                .buttonStyle(PlainButtonStyle())
+                .animatedToggleButton(
+                    isSelected: selectedCategory == category,
+                    cornerRadius: ModernDesignSystem.CornerRadius.large
+                )
             }
             Spacer()
         }

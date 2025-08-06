@@ -20,6 +20,24 @@ struct ModernDesignSystem {
         static let subtleShadow = Color.black.opacity(0.08)
         static let lightShadow = Color.black.opacity( 0.12)
         
+        static let gradientBlueStart = Color(red: 0.3, green: 0.7, blue: 1.0)
+        static let gradientBlueMid = Color(red: 0.1, green: 0.5, blue: 0.9)
+        static let gradientPurple = Color(red: 0.6, green: 0.3, blue: 0.9)
+        static let gradientGreen = Color(red: 0.2, green: 0.8, blue: 0.6)
+        static let gradientBlueEnd = Color(red: 0.0, green: 0.3, blue: 0.7)
+        
+        static let titleGradient = LinearGradient(
+            colors: [
+                gradientBlueStart,
+                gradientBlueMid,
+                gradientPurple,
+                gradientGreen,
+                gradientBlueEnd
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        
         // 去除高光效果 - 保持扁平化
         // 移除了复杂的高光和内阴影系统
     }
@@ -157,8 +175,72 @@ struct FlatButtonStyle: ButtonStyle {
     }
 }
 
+struct AnimatedToggleButtonStyle: ButtonStyle {
+    let isSelected: Bool
+    let cornerRadius: CGFloat
+    
+    init(isSelected: Bool, cornerRadius: CGFloat = ModernDesignSystem.CornerRadius.medium) {
+        self.isSelected = isSelected
+        self.cornerRadius = cornerRadius
+    }
+    
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.95 : (isSelected ? 1.05 : 1.0))
+            .background(
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .fill(
+                        isSelected ? 
+                        LinearGradient(
+                            colors: [
+                                ModernDesignSystem.Colors.gradientBlueStart,
+                                ModernDesignSystem.Colors.gradientBlueMid
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ) :
+                        LinearGradient(
+                            colors: [
+                                ModernDesignSystem.Colors.cardBackground,
+                                ModernDesignSystem.Colors.cardBackground
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .shadow(
+                        color: isSelected ? 
+                            ModernDesignSystem.Colors.gradientBlueStart.opacity(0.4) : 
+                            ModernDesignSystem.Colors.subtleShadow,
+                        radius: isSelected ? 8 : 2,
+                        x: 0,
+                        y: isSelected ? 4 : 1
+                    )
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .stroke(
+                        isSelected ? 
+                            ModernDesignSystem.Colors.gradientBlueStart.opacity(0.6) : 
+                            ModernDesignSystem.Colors.softBorder,
+                        lineWidth: isSelected ? 2 : 1
+                    )
+            )
+            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
+            .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
+    }
+}
+
 // MARK: - View Extensions
 extension View {
+    func titleGradient() -> some View {
+        self.foregroundStyle(ModernDesignSystem.Colors.titleGradient)
+    }
+    
+    func animatedToggleButton(isSelected: Bool, cornerRadius: CGFloat = ModernDesignSystem.CornerRadius.medium) -> some View {
+        self.buttonStyle(AnimatedToggleButtonStyle(isSelected: isSelected, cornerRadius: cornerRadius))
+    }
+    
     func flatCard(
         isActive: Bool = false,
         cornerRadius: CGFloat = ModernDesignSystem.CornerRadius.medium,

@@ -161,11 +161,23 @@ struct MainView: View {
             // Title and settings button
             ZStack {
                 // Centered title
-                VStack(spacing: 4) {
-                    Text(LocalizedStrings.current.appTitle)
-                        .font(.system(size: 22, weight: .bold))
+                VStack(spacing: 6) {
+                    HStack(alignment: .center, spacing: 8) {
+                        Image(nsImage: NSApp.applicationIconImage)
+                            .resizable()
+                            .frame(width: 28, height: 28)
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                        
+                        Text(LocalizedStrings.current.appTitle)
+                            .font(.custom("SF Pro Display", size: 26))
+                            .fontWeight(.bold)
+                            .titleGradient()
+                            .shadow(color: .black.opacity(0.3), radius: 2, x: 1, y: 1)
+                            .baselineOffset(-7)
+                    }
+                    
                     Text(LocalizedStrings.current.appSubtitle)
-                        .font(.system(size: 13))
+                        .font(.system(size: 13, weight: .medium))
                         .foregroundColor(.secondary)
                 }
                 
@@ -188,9 +200,12 @@ struct MainView: View {
 
             GeometryReader { geometry in
                 let availableHeight = geometry.size.height - 20
-                let columnWidth = (geometry.size.width - 80) / 3
+                let horizontalPadding: CGFloat = 20
+                let columnSpacing: CGFloat = 20
+                let availableWidth = geometry.size.width - (horizontalPadding * 2)
+                let columnWidth = (availableWidth - (columnSpacing * 2)) / 3
 
-                HStack(alignment: .top, spacing: 20) {
+                HStack(alignment: .top, spacing: columnSpacing) {
                     VStack(spacing: 15) {
                         displaySelectorPanel()
                             .frame(height: 150)
@@ -231,7 +246,7 @@ struct MainView: View {
                     transitionSettingsPanel()
                         .frame(width: columnWidth, height: availableHeight)
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, horizontalPadding)
                 .padding(.vertical, 10)
             }
 
@@ -343,6 +358,8 @@ struct MainView: View {
                 scale: $scale,
                 offset: $offset
             )
+            .padding(12)
+            .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
         } else {
             Text(LocalizedStrings.current.previewPrompt)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

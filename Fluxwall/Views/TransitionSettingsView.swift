@@ -83,6 +83,7 @@ struct AnimatedApplyButton: View {
 struct TransitionSettingsView: View {
     @Binding var transitionType: TransitionType
     @Binding var transitionDuration: Double
+    @StateObject private var languageSettings = LanguageSettings.shared
     
     var hasSelectedFile: Bool
     var isBuiltInWallpaper: Bool = false
@@ -118,49 +119,57 @@ struct TransitionSettingsView: View {
                 .font(.system(size: 14, weight: .semibold))
                 .padding(.bottom, 2)
             
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text(LocalizedStrings.current.transitionType)
                     .font(.system(size: 12, weight: .medium))
                 
-                HStack(spacing: 8) {
+                HStack(spacing: 6) {
                     TransitionTypeButton(
                         type: .none,
                         selectedType: $transitionType,
                         isEnabled: hasSelectedFile
                     )
+                    .frame(maxWidth: .infinity)
                     
                     TransitionTypeButton(
                         type: .fade,
                         selectedType: $transitionType,
                         isEnabled: hasSelectedFile && !isBuiltInWallpaper
                     )
+                    .frame(maxWidth: .infinity)
                     
                     TransitionTypeButton(
                         type: .blackout,
                         selectedType: $transitionType,
                         isEnabled: hasSelectedFile && !isBuiltInWallpaper
                     )
+                    .frame(maxWidth: .infinity)
                 }
             }
             .padding(.horizontal, 4)
             
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Text(LocalizedStrings.current.transitionDuration)
                         .font(.system(size: 12, weight: .medium))
                     Spacer()
                     Text("\(String(format: "%.1f", transitionDuration))\(LocalizedStrings.current.seconds)")
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(.primary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(ModernDesignSystem.Colors.cardBackground)
+                        )
                 }
                 
                 Slider(value: $transitionDuration, in: 0.5...5.0, step: 0.1)
-                    .accentColor(.blue)
+                    .accentColor(ModernDesignSystem.Colors.gradientBlueStart)
                     .disabled(!hasSelectedFile)
-                    .scaleEffect(0.9)
             }
             .padding(.horizontal, 4)
-            .padding(.vertical, 3)
+            .padding(.vertical, 6)
             
             if hasSelectedFile {
                 VStack(alignment: .leading, spacing: 6) {
@@ -236,108 +245,55 @@ struct TransitionTypeButton: View {
     let type: TransitionType
     @Binding var selectedType: TransitionType
     let isEnabled: Bool
-    @State private var isPressed: Bool = false
+    @StateObject private var languageSettings = LanguageSettings.shared
     
     var body: some View {
         Button(action: {
             if isEnabled {
-                // Add haptic feedback
-                withAnimation(.easeInOut(duration: 0.1)) {
-                    isPressed = true
-                }
-                
-                selectedType = type
-                
-                // Reset pressed state
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    withAnimation(.easeInOut(duration: 0.1)) {
-                        isPressed = false
-                    }
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                    selectedType = type
                 }
             }
         }) {
-            VStack(spacing: 4) {
-                // Icon - compact with animation
+            VStack(spacing: 8) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(selectedType == type ? Color.blue.opacity(0.2) : Color(.controlBackgroundColor))
-                        .frame(width: 60, height: 40)
-                        .scaleEffect(isPressed ? 0.95 : 1.0)
-                        .animation(.easeInOut(duration: 0.1), value: isPressed)
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color(.controlBackgroundColor).opacity(0.5))
+                        .frame(height: 45)
+                        .frame(maxWidth: .infinity)
                     
-                    // Transition effect diagram - compact
-                    if type == .none {
-                        // No transition - show two separate rectangles for instant switch
-                        HStack(spacing: 4) {
-                            Rectangle()
-                                .fill(Color.blue.opacity(0.7))
-                                .frame(width: 22, height: 25)
-                            
-                            // Middle divider for instant switch
-                            Rectangle()
-                                .fill(Color.white)
-                                .frame(width: 2, height: 25)
-                            
-                            Rectangle()
-                                .fill(Color.green.opacity(0.7))
-                                .frame(width: 22, height: 25)
-                        }
-                    } else if type == .fade {
-                        HStack(spacing: 0) {
-                            Rectangle()
-                                .fill(Color.blue.opacity(0.7))
-                                .frame(width: 18, height: 25)
-                            
-                            LinearGradient(
-                                gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.green.opacity(0.7)]),
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                            .frame(width: 24, height: 25)
-                            
-                            Rectangle()
-                                .fill(Color.green.opacity(0.7))
-                                .frame(width: 18, height: 25)
-                        }
-                    } else {
-                        HStack(spacing: 0) {
-                            Rectangle()
-                                .fill(Color.blue.opacity(0.7))
-                                .frame(width: 18, height: 25)
-                            
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    Color.blue.opacity(0.3),
-                                    Color.black,
-                                    Color.green.opacity(0.3)
-                                ]),
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                            .frame(width: 24, height: 25)
-                            
-                            Rectangle()
-                                .fill(Color.green.opacity(0.7))
-                                .frame(width: 18, height: 25)
-                        }
-                    }
+                    getTransitionIcon()
+                        .foregroundColor(selectedType == type ? .white : .primary)
                 }
-                .overlay(
-                    RoundedRectangle(cornerRadius: 6)
-                        .stroke(selectedType == type ? Color.blue : Color.clear, lineWidth: 1.5)
-                        .animation(.easeInOut(duration: 0.2), value: selectedType == type)
-                )
                 
-                // Text - compact
                 Text(getTransitionTypeName(type))
-                    .font(.system(size: 10))
-                    .foregroundColor(isEnabled ? .primary : .secondary)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(selectedType == type ? .white : .primary)
             }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
         }
-        .buttonStyle(PlainButtonStyle())
+        .animatedToggleButton(
+            isSelected: selectedType == type,
+            cornerRadius: ModernDesignSystem.CornerRadius.medium
+        )
         .opacity(isEnabled ? 1.0 : 0.5)
-        .scaleEffect(isPressed ? 0.98 : 1.0)
-        .animation(.easeInOut(duration: 0.1), value: isPressed)
+        .disabled(!isEnabled)
+    }
+    
+    @ViewBuilder
+    private func getTransitionIcon() -> some View {
+        switch type {
+        case .none:
+            Image(systemName: "rectangle.2.swap")
+                .font(.system(size: 18, weight: .medium))
+        case .fade:
+            Image(systemName: "circle.righthalf.filled")
+                .font(.system(size: 18, weight: .medium))
+        case .blackout:
+            Image(systemName: "moon.fill")
+                .font(.system(size: 18, weight: .medium))
+        }
     }
     
     private func getTransitionTypeName(_ type: TransitionType) -> String {

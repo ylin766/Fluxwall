@@ -16,58 +16,33 @@ struct CropPreviewView: View {
         VStack(spacing: 12) {
             // Screen simulator + thumbnail preview
             ComputerFrameView(displaySize: displaySize) {
-                GeometryReader { previewGeometry in
-                    CropPreviewImage(
-                        image: previewImage,
-                        scale: scale,
-                        offset: offset,
-                        targetDisplaySize: displaySize
+                CropPreviewImage(
+                    image: previewImage,
+                    scale: scale,
+                    offset: offset,
+                    targetDisplaySize: displaySize
+                )
+                .gesture(
+                    DragGesture()
+                        .updating($dragOffset) { value, state, _ in
+                            state = value.translation
+                        }
+                        .onEnded { value in
+                            // Calculate relative offset based on display size
+                            let newOffset = CGSize(
+                                width: lastOffset.width + value.translation.width,
+                                height: lastOffset.height + value.translation.height
+                            )
+                            lastOffset = newOffset
+                            offset = newOffset
+                            onOffsetChanged?(newOffset)
+                        }
+                )
+                .onChange(of: dragOffset) { newDrag in
+                    offset = CGSize(
+                        width: lastOffset.width + newDrag.width,
+                        height: lastOffset.height + newDrag.height
                     )
-                    .gesture(
-                        DragGesture()
-                            .updating($dragOffset) { value, state, _ in
-                                state = value.translation
-                            }
-                            .onEnded { value in
-                                // Relative position mapping: preview window is designed according to actual display ratio
-                                // So we directly use the drag distance in preview container as relative offset
-                                // Then map proportionally to actual display size
-                                let previewSize = previewGeometry.size
-                                
-                                // Calculate relative offset (percentage)
-                                let relativeOffsetX = value.translation.width / previewSize.width
-                                let relativeOffsetY = value.translation.height / previewSize.height
-                                
-                                // Apply relative offset to actual display size
-                                let actualOffsetX = relativeOffsetX * displaySize.width
-                                let actualOffsetY = relativeOffsetY * displaySize.height
-                                
-                                let newOffset = CGSize(
-                                    width: lastOffset.width + actualOffsetX,
-                                    height: lastOffset.height + actualOffsetY
-                                )
-                                lastOffset = newOffset
-                                offset = newOffset
-                                onOffsetChanged?(newOffset)
-                            }
-                    )
-                    .onChange(of: dragOffset) { newDrag in
-                        // Use the same relative position mapping for real-time preview
-                        let previewSize = previewGeometry.size
-                        
-                        // Calculate relative offset (percentage)
-                        let relativeOffsetX = newDrag.width / previewSize.width
-                        let relativeOffsetY = newDrag.height / previewSize.height
-                        
-                        // Apply relative offset to actual display size
-                        let actualOffsetX = relativeOffsetX * displaySize.width
-                        let actualOffsetY = relativeOffsetY * displaySize.height
-                        
-                        offset = CGSize(
-                            width: lastOffset.width + actualOffsetX,
-                            height: lastOffset.height + actualOffsetY
-                        )
-                    }
                 }
             }
             .frame(height: 260)
@@ -98,8 +73,6 @@ struct CropPreviewView: View {
                     }
                     .buttonStyle(PlainButtonStyle())
                     .contentShape(RoundedRectangle(cornerRadius: 6))
-                    .scaleEffect(1.0)
-
                 }
 
                 Slider(value: $scale, in: 0.5...2.0, step: 0.01) {
@@ -113,12 +86,6 @@ struct CropPreviewView: View {
                     onScaleChanged?(newValue)
                 }
             }
-
         }
-        .padding(12)
-        .glassCard(
-            cornerRadius: 10,
-            shadowStyle: ModernDesignSystem.Shadow.minimal
-        )
     }
 }
