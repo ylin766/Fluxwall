@@ -1,6 +1,5 @@
 import Foundation
 
-// Localized strings structure
 struct LocalizedStrings {
     static var current = LocalizedStrings.forLanguage(.chinese)
     
@@ -97,6 +96,13 @@ struct LocalizedStrings {
     let dynamicWallpaperDescription: String
     let refresh: String
     
+    // Web wallpaper
+    let enterWebsiteURL: String
+    let invalidURL: String
+    let webWallpaperURLSet: String
+    let settingWebWallpaper: String
+    let webWallpaperSuccess: String
+    
     static func forLanguage(_ language: SupportedLanguage) -> LocalizedStrings {
         switch language {
         case .chinese:
@@ -181,7 +187,13 @@ struct LocalizedStrings {
                 previewAdjustment: "预览调整",
                 staticWallpaperDescription: "静态壁纸将直接应用到桌面",
                 dynamicWallpaperDescription: "动态壁纸会根据时间自动变化",
-                refresh: "刷新"
+                refresh: "刷新",
+                
+                enterWebsiteURL: "请在这里输入网址",
+                invalidURL: "请输入有效的网址",
+                webWallpaperURLSet: "网页壁纸 URL 已设置",
+                settingWebWallpaper: "正在设置网页壁纸...",
+                webWallpaperSuccess: "网页壁纸设置成功"
             )
             
         case .english:
@@ -266,7 +278,13 @@ struct LocalizedStrings {
                 previewAdjustment: "Preview & Adjustment",
                 staticWallpaperDescription: "Static wallpapers will be applied directly to desktop",
                 dynamicWallpaperDescription: "Dynamic wallpapers change automatically based on time",
-                refresh: "Refresh"
+                refresh: "Refresh",
+                
+                enterWebsiteURL: "Enter website URL here",
+                invalidURL: "Please enter a valid URL",
+                webWallpaperURLSet: "Web wallpaper URL has been set",
+                settingWebWallpaper: "Setting web wallpaper...",
+                webWallpaperSuccess: "Web wallpaper set successfully"
             )
         }
     }

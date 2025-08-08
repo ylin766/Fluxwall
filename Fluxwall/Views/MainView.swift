@@ -2,6 +2,7 @@ import SwiftUI
 import AppKit
 import UniformTypeIdentifiers
 import AVKit
+import WebKit
 
 // MARK: - Animated Button Component
 struct AnimatedButton: View {
@@ -138,8 +139,8 @@ struct MainView: View {
     @State private var scale: CGFloat = 1.0
     @State private var offset: CGSize = .zero
     @State private var showingSettings = false
+    @State private var webWallpaperURL: String = ""
     
-    // Calculate if there's a selected wallpaper (user file or system wallpaper)
     private var hasSelectedWallpaper: Bool {
         selectedMediaURL != nil || selectedSystemWallpaper != nil
     }
@@ -158,9 +159,7 @@ struct MainView: View {
             .ignoresSafeArea()
             
             VStack(spacing: 0) {
-            // Title and settings button
             ZStack {
-                // Centered title
                 VStack(spacing: 6) {
                     HStack(alignment: .center, spacing: 8) {
                         Image(nsImage: NSApp.applicationIconImage)
@@ -181,7 +180,6 @@ struct MainView: View {
                         .foregroundColor(.secondary)
                 }
                 
-                // Top-right settings button
                 HStack {
                     Spacer()
                     Button(action: {
@@ -196,7 +194,7 @@ struct MainView: View {
                 }
             }
             .frame(height: 60)
-            .padding(.top, 12)
+            .padding(.top, 16)
 
             GeometryReader { geometry in
                 let availableHeight = geometry.size.height - 20
@@ -206,18 +204,22 @@ struct MainView: View {
                 let columnWidth = (availableWidth - (columnSpacing * 2)) / 3
 
                 HStack(alignment: .top, spacing: columnSpacing) {
-                    VStack(spacing: 15) {
+                    VStack(spacing: 0) {
                         displaySelectorPanel()
                             .frame(height: 150)
+                            .padding(.bottom, 10)
+                            .offset(y: 2)
 
+                        webURLInputPanel()
+                            .frame(height: 72)
+                        
                         fileSelectionPanel()
-                            .frame(height: 387)
+                            .frame(height: 320)
+                        
                     }
-                    .frame(width: columnWidth, height: availableHeight)
+                    .frame(width: columnWidth)
 
-                    // Middle column: split layout
                     VStack(spacing: 12) {
-                        // Top half: built-in wallpapers
                         VStack(spacing: 8) {
                             HStack {
                                 Text(LocalizedStrings.current.builtInWallpapers)
@@ -237,7 +239,6 @@ struct MainView: View {
                         .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
                         .frame(maxHeight: .infinity)
                         
-                        // Bottom half: crop preview area
                         cropPreviewPanel()
                             .frame(maxHeight: .infinity)
                     }
@@ -258,7 +259,6 @@ struct MainView: View {
             statusMessage = LocalizedStrings.current.ready
         }
         .onChange(of: languageSettings.currentLanguage) { _ in
-            // Update status message when language changes
             if !hasSelectedWallpaper {
                 statusMessage = LocalizedStrings.current.ready
             }
@@ -268,7 +268,6 @@ struct MainView: View {
         }
     }
 
-    // MARK: - Left Column: File Selection
     @ViewBuilder
     private func fileSelectionPanel() -> some View {
         VStack(spacing: 12) {
@@ -278,7 +277,7 @@ struct MainView: View {
                     handleFileSelection(url: firstUrl)
                 }
             }
-            .frame(height: 100)
+            .frame(height: 120)
             .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
             .overlay(
                 VStack(spacing: 6) {
@@ -304,10 +303,7 @@ struct MainView: View {
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
 
-                Text("\(LocalizedStrings.current.currentWallpaper): \(wallpaperManager.currentWallpaperName)")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(.primary)
-                    .lineLimit(1)
+                CurrentWallpaperNameView()
             }
 
             Button(action: {
@@ -334,7 +330,6 @@ struct MainView: View {
         .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
     }
 
-    // MARK: - Display Selection
     @ViewBuilder
     private func displaySelectorPanel() -> some View {
         DisplaySelectorView(displays: $displays, onDisplaySelected: { displayID in
@@ -343,8 +338,14 @@ struct MainView: View {
         .padding(12)
         .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
     }
+    
+    @ViewBuilder
+    private func webURLInputPanel() -> some View {
+        WebWallpaperURLInput { urlString in
+            handleWebWallpaperURLAndApply(urlString)
+        }
+    }
 
-    // MARK: - Middle Column: Crop Preview
     @ViewBuilder
     private func cropPreviewPanel() -> some View {
         if let image = previewImage {
@@ -367,7 +368,6 @@ struct MainView: View {
         }
     }
 
-    // MARK: - Right Column: Transition Settings
     @ViewBuilder
     private func transitionSettingsPanel() -> some View {
         TransitionSettingsView(
@@ -384,7 +384,6 @@ struct MainView: View {
         .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
     }
 
-    // MARK: - File Selection Logic
     private func selectFile() {
         let panel = NSOpenPanel()
         panel.allowsMultipleSelection = false
@@ -407,8 +406,9 @@ struct MainView: View {
     }
 
     private func handleFileSelection(url: URL) {
-        // Clear system wallpaper selection
         selectedSystemWallpaper = nil
+        webWallpaperURL = ""
+        WebWallpaperService.shared.removeWebWallpaper()
         
         let ext = url.pathExtension.lowercased()
 
@@ -416,10 +416,9 @@ struct MainView: View {
             if let image = NSImage(contentsOf: url) {
                 self.previewImage = image
                 self.firstFrame = image
-                self.lastFrame = image  // For images, first and last frame are the same
+                self.lastFrame = image
             }
         } else if ["mp4", "mov", "avi", "m4v", "mkv"].contains(ext) {
-            // Extract first and last frames from video
             extractVideoFrames(from: url)
         }
 
@@ -457,9 +456,7 @@ struct MainView: View {
         generator.requestedTimeToleranceAfter = .zero
         generator.requestedTimeToleranceBefore = .zero
         
-        // Extract frames asynchronously to avoid blocking UI
         DispatchQueue.global(qos: .userInitiated).async {
-            // First get video duration
             asset.loadValuesAsynchronously(forKeys: ["duration"]) {
                 var error: NSError?
                 let status = asset.statusOfValue(forKey: "duration", error: &error)
@@ -468,9 +465,7 @@ struct MainView: View {
                     let duration = asset.duration
                     let durationSeconds = CMTimeGetSeconds(duration)
                     
-                    // Extract first frame (0 seconds)
                     let firstFrameTime = CMTime.zero
-                    // Extract last frame (0.1 seconds before end to avoid black frames)
                     let lastFrameTime = CMTime(seconds: max(0, durationSeconds - 0.1), preferredTimescale: 600)
                     
                     let times = [NSValue(time: firstFrameTime), NSValue(time: lastFrameTime)]
@@ -484,15 +479,12 @@ struct MainView: View {
                             
                             DispatchQueue.main.async {
                                 if CMTimeCompare(requestedTime, firstFrameTime) == 0 {
-                                    // This is the first frame
                                     self.firstFrame = nsImage
-                                    self.previewImage = nsImage  // Also use as main preview
+                                    self.previewImage = nsImage
                                 } else {
-                                    // This is the last frame
                                     self.lastFrame = nsImage
                                 }
                                 
-                                // Update status when both frames are extracted
                                 if self.firstFrame != nil && self.lastFrame != nil {
                                     self.statusMessage = LocalizedStrings.current.videoSelected
                                 }
@@ -518,7 +510,6 @@ struct MainView: View {
     }
 
     private func applyWallpaper() {
-        // Handle user-selected files (including converted system wallpapers)
         guard let url = selectedMediaURL else {
             statusMessage = LocalizedStrings.current.pleaseSelectFile
             return
@@ -556,6 +547,8 @@ struct MainView: View {
     
 
     
+
+    
     private func handleSystemWallpaperSelection(_ wallpaper: SystemWallpaper) {
         selectedSystemWallpaper = nil
         
@@ -569,6 +562,19 @@ struct MainView: View {
         selectedMediaURL = fileURL
         handleFileSelection(url: fileURL)
         statusMessage = "\(LocalizedStrings.current.imageSelected): \(wallpaper.displayName)"
+    }
+    
+    private func handleWebWallpaperURLAndApply(_ urlString: String) {
+        guard let url = URL(string: urlString), 
+              url.scheme == "http" || url.scheme == "https" else {
+            statusMessage = LocalizedStrings.current.invalidURL
+            return
+        }
+        
+        webWallpaperURL = urlString
+        statusMessage = "Web wallpaper feature under development"
+        
+        WebWallpaperService.shared.openWebBrowser(url: url)
     }
 
     

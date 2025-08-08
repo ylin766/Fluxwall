@@ -1025,7 +1025,7 @@ class FluxwallWallpaperManager: ObservableObject {
     static let shared = FluxwallWallpaperManager()
     
     @Published var isVideoActive = false
-    @Published var currentWallpaperName = LocalizedStrings.current.systemDefault
+    @Published var currentWallpaperName = "System Default"
     @Published var isVideoPaused = false
     
     private var desktopWindows: [CGDirectDisplayID: DesktopOverlayWindow] = [:]
@@ -1335,16 +1335,16 @@ class FluxwallWallpaperManager: ObservableObject {
         
         stopVideoWallpaper()
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             guard let self = self else {
                 return
             }
             
-            self.currentWallpaperName = LocalizedStrings.current.systemDefault
+            self.currentWallpaperName = "System Default"
             self.isVideoActive = false
             self.isVideoPaused = false
-            
-            self.attemptToSetSystemWallpaper()
+            self.currentVideoURL = nil
+            self.currentImageURL = nil
             
             self.isRestoringSystemWallpaper = false
         }
@@ -1352,70 +1352,5 @@ class FluxwallWallpaperManager: ObservableObject {
         return true
     }
     
-    func attemptToSetSystemWallpaper() {
-        
-        let defaultWallpaperPaths = [
-            "/System/Library/Desktop Pictures/Monterey.heic",
-            "/System/Library/Desktop Pictures/Big Sur.heic",
-            "/System/Library/Desktop Pictures/Catalina.heic"
-        ]
-        
-        var success = false
-        
-        for path in defaultWallpaperPaths where !success {
-            let url = URL(fileURLWithPath: path)
-            
-            if FileManager.default.fileExists(atPath: path) {
-                do {
-                    let screens = NSScreen.screens
-                    
-                    for (index, screen) in screens.enumerated() {
-                        try NSWorkspace.shared.setDesktopImageURL(url, for: screen, options: [:])
-                    }
-                    
-                    success = true
-                    break
-                } catch {
-                }
-            } else {
-            }
-        }
-        
-        if !success {
-            createAndSetSolidColorWallpaper()
-        }
-    }
-    
-    func createAndSetSolidColorWallpaper() {
-        
-        do {
-            let size = NSSize(width: 1920, height: 1080)
-            
-            let image = NSImage(size: size)
-            
-            image.lockFocus()
-            NSColor.darkGray.setFill()
-            NSRect(origin: .zero, size: size).fill()
-            image.unlockFocus()
-            
-            let tempDir = FileManager.default.temporaryDirectory
-            let tempURL = tempDir.appendingPathComponent("default_wallpaper.png")
-            
-            if let tiffData = image.tiffRepresentation,
-               let bitmap = NSBitmapImageRep(data: tiffData),
-               let pngData = bitmap.representation(using: .png, properties: [:]) {
-                
-                try pngData.write(to: tempURL)
-                
-                let screens = NSScreen.screens
-                
-                for (index, screen) in screens.enumerated() {
-                    try NSWorkspace.shared.setDesktopImageURL(tempURL, for: screen, options: [:])
-                }
-                
-            } else {
-            }
-        } catch {
-        }
-    }
+
 }
