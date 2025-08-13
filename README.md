@@ -17,4 +17,4 @@ MP4, MOV, JPG, PNG
 
 ## Requirements
 
-macOS 15.5+
+macOS 12.0+
