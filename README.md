@@ -2,6 +2,10 @@
 
 Fluxwall is a free, lightweight macOS app dedicated to dynamic video wallpapers on your desktop. It gives you full DIY control to preview, customize, and animate your wallpaper experience.
 
+<img width="990" height="646" alt="image" src="https://github.com/user-attachments/assets/841f80e7-1509-4471-aa80-f6ca80bbdc53" />
+
+
+
 ## Features
 
 - **Video and image wallpaper support** - Custom video files and images
