@@ -29,3 +29,17 @@ DerivedData
 .DS_Store
 .AppleDouble
 .LSOverride
+
+# Build outputs
+build/
+*.dmg
+*.pkg
+*.zip
+*.xcarchive
+
+# Local build configuration
+build_config_local.sh
+
+# Temporary files
+*.tmp
+*.temp
