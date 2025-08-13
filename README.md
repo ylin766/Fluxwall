@@ -4,54 +4,57 @@ Fluxwall is a free, lightweight macOS app dedicated to dynamic video wallpapers 
 
 ## Features
 
-- Video and image wallpaper support
-- Drag & drop file selection
-- Transition effects with customizable duration
-- Multi-display support
-- Click-to-preview transition effects
-- Language support (English/中文)
+- **Video and image wallpaper support** - Custom video files and images
+- **Built-in system wallpapers** - Access macOS dynamic wallpapers directly
+- **Web wallpaper embedding** - 🚧 *Coming soon* - Embed web pages as live wallpapers
+- **Drag & drop file selection** - Easy file management
+- **Transition effects** - Customizable duration and animation types
+- **Multi-display support** - Independent wallpapers for each screen
+- **Click-to-preview** - Test transition effects instantly
+- **Language support** - English/中文
 
-## Supported Formats
+## Wallpaper Sources
 
-MP4, MOV, JPG, PNG
+- **Custom Files**: MP4, MOV, JPG, PNG
+- **Built-in Wallpapers**: macOS dynamic wallpapers (including animated ones)
+- **Web Pages**: 🚧 *In development* - Live web content as wallpapers
 
 ## Requirements
 
 macOS 12.0+
 
-## Build from Source
+## Getting Started
 
-### Prerequisites
+### Quick Install (Build from Source)
 
-- Xcode 14.0+
-- macOS 12.0+
-
-### Building
-
-1. Clone the repository:
+1. **Clone and build**:
    ```bash
    git clone https://github.com/ylin766/Fluxwall.git
    cd Fluxwall
-   ```
-
-2. Build the DMG installer:
-   ```bash
    ./build_dmg.sh
    ```
 
-3. The script will:
-   - Build the Release version of Fluxwall
-   - Create `Fluxwall.dmg` in the project root
+2. **Install**: Open `Fluxwall.dmg` → Drag to Applications
 
-### Installation
-
-1. Open the generated `Fluxwall.dmg` file
-2. Drag `Fluxwall.app` to the `Applications` folder
-3. Launch Fluxwall from Applications or Spotlight
+3. **Launch**: Open Fluxwall from Applications
 
 ### Usage
 
-1. Launch Fluxwall
-2. Drag and drop video files or use the file picker
-3. Customize transition effects and duration
-4. Enjoy your dynamic wallpaper!
+**Custom Wallpapers**:
+- Drag & drop video/image files
+- Or use the file picker button
+
+**Built-in Wallpapers**:
+- Click "Built-in Wallpapers" tab
+- Browse macOS dynamic wallpapers
+- Select and apply instantly
+
+**Settings**:
+- Adjust transition effects and duration
+- Configure multi-display setups
+- Switch between English/中文
+
+### Requirements
+
+- macOS 12.0+
+- Xcode 14.0+ (for building)
