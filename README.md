@@ -25,18 +25,21 @@ macOS 12.0+
 
 ## Getting Started
 
-### Quick Install (Build from Source)
+### Quick Install (Recommended)
 
-1. **Clone and build**:
-   ```bash
-   git clone https://github.com/ylin766/Fluxwall.git
-   cd Fluxwall
-   ./build_dmg.sh
-   ```
+1. **Download**: [📥 Fluxwall.dmg](https://github.com/ylin766/Fluxwall/raw/main/Fluxwall.dmg)
 
 2. **Install**: Open `Fluxwall.dmg` → Drag to Applications
 
 3. **Launch**: Open Fluxwall from Applications
+
+### Build from Source (Optional)
+
+```bash
+git clone https://github.com/ylin766/Fluxwall.git
+cd Fluxwall
+./build_dmg.sh
+```
 
 ### Usage
 

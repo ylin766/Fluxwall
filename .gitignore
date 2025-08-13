@@ -32,7 +32,6 @@ DerivedData
 
 # Build outputs
 build/
-*.dmg
 *.pkg
 *.zip
 *.xcarchive
