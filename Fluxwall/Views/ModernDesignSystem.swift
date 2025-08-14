@@ -8,7 +8,7 @@ struct ModernDesignSystem {
             case .dark:
                 return Color(red: 0.94, green: 0.94, blue: 0.95, opacity: 0.06)
             case .light:
-                return Color(.controlBackgroundColor).opacity(0.8)
+                return Color.white.opacity(0.25)
             @unknown default:
                 return Color(red: 0.94, green: 0.94, blue: 0.95, opacity: 0.06)
             }
@@ -19,7 +19,7 @@ struct ModernDesignSystem {
             case .dark:
                 return Color(red: 0.96, green: 0.96, blue: 0.97, opacity: 0.09)
             case .light:
-                return Color(.controlBackgroundColor).opacity(0.95)
+                return Color.white.opacity(0.4)
             @unknown default:
                 return Color(red: 0.96, green: 0.96, blue: 0.97, opacity: 0.09)
             }
@@ -30,7 +30,7 @@ struct ModernDesignSystem {
             case .dark:
                 return Color(red: 0.88, green: 0.88, blue: 0.90, opacity: 0.12)
             case .light:
-                return Color(.separatorColor).opacity(0.3)
+                return Color.white.opacity(0.6)
             @unknown default:
                 return Color(red: 0.88, green: 0.88, blue: 0.90, opacity: 0.12)
             }
@@ -41,7 +41,7 @@ struct ModernDesignSystem {
             case .dark:
                 return Color(red: 0.82, green: 0.82, blue: 0.85, opacity: 0.18)
             case .light:
-                return Color(.separatorColor).opacity(0.5)
+                return Color.white.opacity(0.8)
             @unknown default:
                 return Color(red: 0.82, green: 0.82, blue: 0.85, opacity: 0.18)
             }
@@ -52,7 +52,7 @@ struct ModernDesignSystem {
             case .dark:
                 return Color.black.opacity(0.08)
             case .light:
-                return Color(.shadowColor).opacity(0.1)
+                return Color.black.opacity(0.05)
             @unknown default:
                 return Color.black.opacity(0.08)
             }
@@ -63,7 +63,7 @@ struct ModernDesignSystem {
             case .dark:
                 return Color.black.opacity(0.12)
             case .light:
-                return Color(.shadowColor).opacity(0.15)
+                return Color.black.opacity(0.08)
             @unknown default:
                 return Color.black.opacity(0.12)
             }
@@ -212,17 +212,27 @@ struct AdaptiveCardStyle: ViewModifier {
     func body(content: Content) -> some View {
         content
             .background(
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .fill(
-                        isActive ? 
-                        ModernDesignSystem.Colors.cardBackgroundActive(for: colorScheme) : 
-                        ModernDesignSystem.Colors.cardBackground(for: colorScheme)
-                    )
-                    .background(
-                        colorScheme == .light ?
+                Group {
+                    if colorScheme == .light {
                         RoundedRectangle(cornerRadius: cornerRadius)
-                            .fill(.ultraThinMaterial) : nil
-                    )
+                            .fill(.thinMaterial)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: cornerRadius)
+                                    .fill(
+                                        isActive ? 
+                                        ModernDesignSystem.Colors.cardBackgroundActive(for: colorScheme) : 
+                                        ModernDesignSystem.Colors.cardBackground(for: colorScheme)
+                                    )
+                            )
+                    } else {
+                        RoundedRectangle(cornerRadius: cornerRadius)
+                            .fill(
+                                isActive ? 
+                                ModernDesignSystem.Colors.cardBackgroundActive(for: colorScheme) : 
+                                ModernDesignSystem.Colors.cardBackground(for: colorScheme)
+                            )
+                    }
+                }
             )
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius)
@@ -236,9 +246,9 @@ struct AdaptiveCardStyle: ViewModifier {
             )
             .shadow(
                 color: ModernDesignSystem.Colors.subtleShadow(for: colorScheme),
-                radius: shadowStyle?.radius ?? 2,
+                radius: shadowStyle?.radius ?? (colorScheme == .light ? 4 : 2),
                 x: shadowStyle?.offset.width ?? 0,
-                y: shadowStyle?.offset.height ?? 1
+                y: shadowStyle?.offset.height ?? (colorScheme == .light ? 2 : 1)
             )
     }
 }
@@ -292,39 +302,41 @@ struct DragDropCardStyle: ViewModifier {
     func body(content: Content) -> some View {
         content
             .background(
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .fill(
-                        colorScheme == .light ?
-                        Color(.controlBackgroundColor).opacity(0.3) :
-                        Color(red: 0.94, green: 0.94, blue: 0.95, opacity: 0.06)
-                    )
-                    .background(
-                        colorScheme == .light ?
+                Group {
+                    if colorScheme == .light {
                         RoundedRectangle(cornerRadius: cornerRadius)
-                            .fill(.ultraThinMaterial) : nil
-                    )
+                            .fill(.thinMaterial)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: cornerRadius)
+                                    .fill(Color.white.opacity(0.15))
+                            )
+                    } else {
+                        RoundedRectangle(cornerRadius: cornerRadius)
+                            .fill(Color(red: 0.94, green: 0.94, blue: 0.95, opacity: 0.06))
+                    }
+                }
             )
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius)
                     .stroke(
                         colorScheme == .light ?
-                        Color(.separatorColor).opacity(0.2) :
+                        Color.white.opacity(0.4) :
                         Color(red: 0.88, green: 0.88, blue: 0.90, opacity: 0.12),
                         lineWidth: 1.0
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: cornerRadius)
                             .stroke(
-                                ModernDesignSystem.Colors.infoColor.opacity(0.3),
+                                ModernDesignSystem.Colors.infoColor.opacity(colorScheme == .light ? 0.4 : 0.3),
                                 style: StrokeStyle(lineWidth: 2, dash: [8, 4])
                             )
                     )
             )
             .shadow(
                 color: ModernDesignSystem.Colors.subtleShadow(for: colorScheme),
-                radius: 2,
+                radius: colorScheme == .light ? 4 : 2,
                 x: 0,
-                y: 1
+                y: colorScheme == .light ? 2 : 1
             )
     }
 }
@@ -348,39 +360,39 @@ struct AnimatedToggleButtonStyle: ButtonStyle {
             )
             .scaleEffect(configuration.isPressed ? 0.95 : (isSelected ? 1.05 : 1.0))
             .background(
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .fill(
-                        isSelected ? 
-                        LinearGradient(
-                            colors: [
-                                ModernDesignSystem.Colors.gradientBlueStart,
-                                ModernDesignSystem.Colors.gradientBlueMid
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ) :
-                        LinearGradient(
-                            colors: [
-                                ModernDesignSystem.Colors.cardBackground(for: colorScheme),
-                                ModernDesignSystem.Colors.cardBackground(for: colorScheme)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .background(
-                        colorScheme == .light && !isSelected ?
+                Group {
+                    if isSelected {
                         RoundedRectangle(cornerRadius: cornerRadius)
-                            .fill(.ultraThinMaterial) : nil
-                    )
-                    .shadow(
-                        color: isSelected ? 
-                            ModernDesignSystem.Colors.gradientBlueStart.opacity(0.4) : 
-                            ModernDesignSystem.Colors.subtleShadow(for: colorScheme),
-                        radius: isSelected ? 8 : 2,
-                        x: 0,
-                        y: isSelected ? 4 : 1
-                    )
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        ModernDesignSystem.Colors.gradientBlueStart,
+                                        ModernDesignSystem.Colors.gradientBlueMid
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                    } else if colorScheme == .light {
+                        RoundedRectangle(cornerRadius: cornerRadius)
+                            .fill(.thinMaterial)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: cornerRadius)
+                                    .fill(ModernDesignSystem.Colors.cardBackground(for: colorScheme))
+                            )
+                    } else {
+                        RoundedRectangle(cornerRadius: cornerRadius)
+                            .fill(ModernDesignSystem.Colors.cardBackground(for: colorScheme))
+                    }
+                }
+                .shadow(
+                    color: isSelected ? 
+                        ModernDesignSystem.Colors.gradientBlueStart.opacity(0.4) : 
+                        ModernDesignSystem.Colors.subtleShadow(for: colorScheme),
+                    radius: isSelected ? 8 : (colorScheme == .light ? 4 : 2),
+                    x: 0,
+                    y: isSelected ? 4 : (colorScheme == .light ? 2 : 1)
+                )
             )
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius)
