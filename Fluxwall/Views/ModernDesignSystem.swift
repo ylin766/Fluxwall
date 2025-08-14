@@ -3,16 +3,103 @@ import SwiftUI
 struct ModernDesignSystem {
     
     struct Colors {
-        static let cardBackground = Color(.controlBackgroundColor).opacity(0.6)
-        static let cardBackgroundActive = Color(.controlBackgroundColor).opacity(0.8)
-        static let cardBackgroundSecondary = Color(.windowBackgroundColor).opacity(0.9)
+        static func cardBackground(for colorScheme: ColorScheme) -> Color {
+            switch colorScheme {
+            case .dark:
+                return Color(red: 0.94, green: 0.94, blue: 0.95, opacity: 0.06)
+            case .light:
+                return Color(.controlBackgroundColor).opacity(0.8)
+            @unknown default:
+                return Color(red: 0.94, green: 0.94, blue: 0.95, opacity: 0.06)
+            }
+        }
         
-        static let softBorder = Color(.separatorColor).opacity(0.5)
-        static let softBorderActive = Color(.separatorColor).opacity(0.8)
-        static let accentBorder = Color.accentColor.opacity(0.6)
+        static func cardBackgroundActive(for colorScheme: ColorScheme) -> Color {
+            switch colorScheme {
+            case .dark:
+                return Color(red: 0.96, green: 0.96, blue: 0.97, opacity: 0.09)
+            case .light:
+                return Color(.controlBackgroundColor).opacity(0.95)
+            @unknown default:
+                return Color(red: 0.96, green: 0.96, blue: 0.97, opacity: 0.09)
+            }
+        }
         
-        static let subtleShadow = Color(.shadowColor).opacity(0.15)
-        static let lightShadow = Color(.shadowColor).opacity(0.25)
+        static func softBorder(for colorScheme: ColorScheme) -> Color {
+            switch colorScheme {
+            case .dark:
+                return Color(red: 0.88, green: 0.88, blue: 0.90, opacity: 0.12)
+            case .light:
+                return Color(.separatorColor).opacity(0.3)
+            @unknown default:
+                return Color(red: 0.88, green: 0.88, blue: 0.90, opacity: 0.12)
+            }
+        }
+        
+        static func softBorderActive(for colorScheme: ColorScheme) -> Color {
+            switch colorScheme {
+            case .dark:
+                return Color(red: 0.82, green: 0.82, blue: 0.85, opacity: 0.18)
+            case .light:
+                return Color(.separatorColor).opacity(0.5)
+            @unknown default:
+                return Color(red: 0.82, green: 0.82, blue: 0.85, opacity: 0.18)
+            }
+        }
+        
+        static func subtleShadow(for colorScheme: ColorScheme) -> Color {
+            switch colorScheme {
+            case .dark:
+                return Color.black.opacity(0.08)
+            case .light:
+                return Color(.shadowColor).opacity(0.1)
+            @unknown default:
+                return Color.black.opacity(0.08)
+            }
+        }
+        
+        static func lightShadow(for colorScheme: ColorScheme) -> Color {
+            switch colorScheme {
+            case .dark:
+                return Color.black.opacity(0.12)
+            case .light:
+                return Color(.shadowColor).opacity(0.15)
+            @unknown default:
+                return Color.black.opacity(0.12)
+            }
+        }
+        
+        static func appBackground(for colorScheme: ColorScheme) -> LinearGradient {
+            switch colorScheme {
+            case .dark:
+                return LinearGradient(
+                    colors: [
+                        Color(red: 0.05, green: 0.05, blue: 0.08),
+                        Color(red: 0.08, green: 0.08, blue: 0.12)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            case .light:
+                return LinearGradient(
+                    colors: [
+                        Color(red: 0.98, green: 0.98, blue: 0.99),
+                        Color(red: 0.95, green: 0.96, blue: 0.98)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            @unknown default:
+                return LinearGradient(
+                    colors: [
+                        Color(red: 0.05, green: 0.05, blue: 0.08),
+                        Color(red: 0.08, green: 0.08, blue: 0.12)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            }
+        }
         
         static let primaryText = Color(.labelColor)
         static let secondaryText = Color(.secondaryLabelColor)
@@ -41,6 +128,7 @@ struct ModernDesignSystem {
             endPoint: .bottomTrailing
         )
         
+        static let accentBorder = Color.accentColor.opacity(0.6)
         static let buttonBackground = Color(.controlColor)
         static let buttonBackgroundActive = Color(.controlAccentColor)
         static let buttonText = Color(.controlTextColor)
@@ -121,22 +209,27 @@ struct AdaptiveCardStyle: ViewModifier {
                 RoundedRectangle(cornerRadius: cornerRadius)
                     .fill(
                         isActive ? 
-                        ModernDesignSystem.Colors.cardBackgroundActive : 
-                        ModernDesignSystem.Colors.cardBackground
+                        ModernDesignSystem.Colors.cardBackgroundActive(for: colorScheme) : 
+                        ModernDesignSystem.Colors.cardBackground(for: colorScheme)
+                    )
+                    .background(
+                        colorScheme == .light ?
+                        RoundedRectangle(cornerRadius: cornerRadius)
+                            .fill(.ultraThinMaterial) : nil
                     )
             )
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius)
                     .stroke(
                         isActive ? 
-                        ModernDesignSystem.Colors.softBorderActive : 
-                        ModernDesignSystem.Colors.softBorder,
+                        ModernDesignSystem.Colors.softBorderActive(for: colorScheme) : 
+                        ModernDesignSystem.Colors.softBorder(for: colorScheme),
                         lineWidth: isActive ? 1.5 : 1.0
                     )
                     .opacity(borderIntensity)
             )
             .shadow(
-                color: shadowStyle.color,
+                color: ModernDesignSystem.Colors.subtleShadow(for: colorScheme),
                 radius: shadowStyle.radius,
                 x: shadowStyle.offset.width,
                 y: shadowStyle.offset.height
@@ -182,6 +275,54 @@ struct AdaptiveButtonStyle: ButtonStyle {
     }
 }
 
+struct DragDropCardStyle: ViewModifier {
+    @Environment(\.colorScheme) var colorScheme
+    let cornerRadius: CGFloat
+    
+    init(cornerRadius: CGFloat = ModernDesignSystem.CornerRadius.large) {
+        self.cornerRadius = cornerRadius
+    }
+    
+    func body(content: Content) -> some View {
+        content
+            .background(
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .fill(
+                        colorScheme == .light ?
+                        Color(.controlBackgroundColor).opacity(0.3) :
+                        Color(red: 0.94, green: 0.94, blue: 0.95, opacity: 0.06)
+                    )
+                    .background(
+                        colorScheme == .light ?
+                        RoundedRectangle(cornerRadius: cornerRadius)
+                            .fill(.ultraThinMaterial) : nil
+                    )
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .stroke(
+                        colorScheme == .light ?
+                        Color(.separatorColor).opacity(0.2) :
+                        Color(red: 0.88, green: 0.88, blue: 0.90, opacity: 0.12),
+                        lineWidth: 1.0
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: cornerRadius)
+                            .stroke(
+                                ModernDesignSystem.Colors.infoColor.opacity(0.3),
+                                style: StrokeStyle(lineWidth: 2, dash: [8, 4])
+                            )
+                    )
+            )
+            .shadow(
+                color: ModernDesignSystem.Colors.subtleShadow(for: colorScheme),
+                radius: 2,
+                x: 0,
+                y: 1
+            )
+    }
+}
+
 struct AnimatedToggleButtonStyle: ButtonStyle {
     let isSelected: Bool
     let cornerRadius: CGFloat
@@ -214,17 +355,22 @@ struct AnimatedToggleButtonStyle: ButtonStyle {
                         ) :
                         LinearGradient(
                             colors: [
-                                ModernDesignSystem.Colors.cardBackground,
-                                ModernDesignSystem.Colors.cardBackground
+                                ModernDesignSystem.Colors.cardBackground(for: colorScheme),
+                                ModernDesignSystem.Colors.cardBackground(for: colorScheme)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                     )
+                    .background(
+                        colorScheme == .light && !isSelected ?
+                        RoundedRectangle(cornerRadius: cornerRadius)
+                            .fill(.ultraThinMaterial) : nil
+                    )
                     .shadow(
                         color: isSelected ? 
                             ModernDesignSystem.Colors.gradientBlueStart.opacity(0.4) : 
-                            ModernDesignSystem.Colors.subtleShadow,
+                            ModernDesignSystem.Colors.subtleShadow(for: colorScheme),
                         radius: isSelected ? 8 : 2,
                         x: 0,
                         y: isSelected ? 4 : 1
@@ -235,7 +381,7 @@ struct AnimatedToggleButtonStyle: ButtonStyle {
                     .stroke(
                         isSelected ? 
                             ModernDesignSystem.Colors.accentBorder : 
-                            ModernDesignSystem.Colors.softBorder,
+                            ModernDesignSystem.Colors.softBorder(for: colorScheme),
                         lineWidth: isSelected ? 2 : 1
                     )
             )
@@ -247,6 +393,10 @@ struct AnimatedToggleButtonStyle: ButtonStyle {
 extension View {
     func titleGradient() -> some View {
         self.foregroundStyle(ModernDesignSystem.Colors.titleGradient)
+    }
+    
+    func dragDropCard(cornerRadius: CGFloat = ModernDesignSystem.CornerRadius.large) -> some View {
+        self.modifier(DragDropCardStyle(cornerRadius: cornerRadius))
     }
     
     func animatedToggleButton(isSelected: Bool, cornerRadius: CGFloat = ModernDesignSystem.CornerRadius.medium) -> some View {

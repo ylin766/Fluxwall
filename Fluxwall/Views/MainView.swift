@@ -145,18 +145,12 @@ struct MainView: View {
         selectedMediaURL != nil || selectedSystemWallpaper != nil
     }
 
+    @Environment(\.colorScheme) var colorScheme
+    
     var body: some View {
         ZStack {
-            // Modern gradient background
-            LinearGradient(
-                colors: [
-                    Color(red: 0.05, green: 0.05, blue: 0.08),
-                    Color(red: 0.08, green: 0.08, blue: 0.12)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
+            ModernDesignSystem.Colors.appBackground(for: colorScheme)
+                .ignoresSafeArea()
             
             VStack(spacing: 0) {
             ZStack {
@@ -278,7 +272,7 @@ struct MainView: View {
                 }
             }
             .frame(height: 120)
-            .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
+            .dragDropCard(cornerRadius: ModernDesignSystem.CornerRadius.large)
             .overlay(
                 VStack(spacing: 6) {
                     Image(systemName: "arrow.down.doc.fill")

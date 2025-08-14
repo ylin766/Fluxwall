@@ -43,25 +43,28 @@ class DragDropView: NSView {
     }
     
     private func updateAppearance() {
+        let isDarkMode = NSApp.effectiveAppearance?.name == .darkAqua
+        
         if isDragOver {
-            // Highlight state - blue border and light blue background
             layer?.backgroundColor = NSColor.systemBlue.withAlphaComponent(0.15).cgColor
             layer?.borderColor = NSColor.systemBlue.cgColor
             layer?.borderWidth = 3
             
-            // Add shadow effect
-            layer?.shadowOpacity = 0.3
+            layer?.shadowOpacity = isDarkMode ? 0.3 : 0.2
             layer?.shadowRadius = 5
             layer?.shadowOffset = CGSize(width: 0, height: 2)
             layer?.shadowColor = NSColor.black.cgColor
         } else {
-            // Normal state - light gray border and transparent background
-            layer?.backgroundColor = NSColor.controlBackgroundColor.cgColor
-            layer?.borderColor = NSColor.separatorColor.cgColor
-            layer?.borderWidth = 2
+            if isDarkMode {
+                layer?.backgroundColor = NSColor.clear.cgColor
+                layer?.borderColor = NSColor.separatorColor.withAlphaComponent(0.3).cgColor
+            } else {
+                layer?.backgroundColor = NSColor.controlBackgroundColor.withAlphaComponent(0.3).cgColor
+                layer?.borderColor = NSColor.separatorColor.withAlphaComponent(0.2).cgColor
+            }
+            layer?.borderWidth = 1
             
-            // Light shadow
-            layer?.shadowOpacity = 0.1
+            layer?.shadowOpacity = isDarkMode ? 0.1 : 0.05
             layer?.shadowRadius = 3
             layer?.shadowOffset = CGSize(width: 0, height: 1)
             layer?.shadowColor = NSColor.black.cgColor
