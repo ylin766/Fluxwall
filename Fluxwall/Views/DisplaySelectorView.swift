@@ -32,7 +32,7 @@ struct DisplaySelectorView: View {
             if displays.isEmpty {
                 Text(LocalizedStrings.current.detectingDisplays)
                     .font(.system(size: 12))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(ModernDesignSystem.Colors.secondaryText)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 8)
             } else {
@@ -294,13 +294,13 @@ struct DisplayCard: View {
                     .cornerRadius(3)
             } else {
                 Rectangle()
-                    .fill(Color.gray.opacity(0.2))
+                    .fill(ModernDesignSystem.Colors.cardBackground)
                     .frame(width: 80, height: 50)
                     .cornerRadius(3)
                     .overlay(
                         Text("\(Int(display.resolution.width)) × \(Int(display.resolution.height))")
                             .font(.system(size: 9))
-                            .foregroundColor(.secondary)
+                            .foregroundColor(ModernDesignSystem.Colors.secondaryText)
                     )
             }
             
@@ -310,7 +310,7 @@ struct DisplayCard: View {
             
             Text("\(Int(display.resolution.width)) × \(Int(display.resolution.height))")
                 .font(.system(size: 8))
-                .foregroundColor(.secondary)
+                .foregroundColor(ModernDesignSystem.Colors.secondaryText)
         }
         .padding(6)
         .frame(width: 100)

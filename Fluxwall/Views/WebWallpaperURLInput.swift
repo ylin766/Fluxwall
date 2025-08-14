@@ -17,7 +17,7 @@ struct WebWallpaperURLInput: View {
             HStack(spacing: 8) {
                 Image(systemName: "globe")
                     .font(.system(size: 14))
-                    .foregroundColor(.blue)
+                    .foregroundColor(ModernDesignSystem.Colors.infoColor)
                 
                 TextField(LocalizedStrings.current.enterWebsiteURL, text: $urlText)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -38,7 +38,7 @@ struct WebWallpaperURLInput: View {
                 }) {
                     Image(systemName: "arrow.right.circle.fill")
                         .font(.system(size: 16))
-                        .foregroundColor(urlText.isEmpty ? .gray : .blue)
+                        .foregroundColor(urlText.isEmpty ? ModernDesignSystem.Colors.tertiaryText : ModernDesignSystem.Colors.infoColor)
                 }
                 .buttonStyle(PlainButtonStyle())
                 .disabled(urlText.isEmpty)
@@ -48,7 +48,7 @@ struct WebWallpaperURLInput: View {
                 }) {
                     Image(systemName: "ladybug.fill")
                         .font(.system(size: 14))
-                        .foregroundColor(.orange)
+                        .foregroundColor(ModernDesignSystem.Colors.warningColor)
                 }
                 .buttonStyle(PlainButtonStyle())
                 .help("Debug Web Browser")
@@ -58,7 +58,7 @@ struct WebWallpaperURLInput: View {
                 }) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.system(size: 14))
-                        .foregroundColor(.red)
+                        .foregroundColor(ModernDesignSystem.Colors.errorColor)
                 }
                 .buttonStyle(PlainButtonStyle())
                 .help("Close Browser")

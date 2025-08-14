@@ -22,20 +22,20 @@ struct AnimatedButton: View {
     var backgroundColor: Color {
         switch style {
         case .primary:
-            return .blue
+            return ModernDesignSystem.Colors.infoColor
         case .secondary:
-            return Color(.controlBackgroundColor)
+            return ModernDesignSystem.Colors.buttonBackground
         case .success:
-            return .green
+            return ModernDesignSystem.Colors.successColor
         }
     }
     
     var foregroundColor: Color {
         switch style {
         case .primary, .success:
-            return .white
+            return ModernDesignSystem.Colors.buttonTextActive
         case .secondary:
-            return .primary
+            return ModernDesignSystem.Colors.primaryText
         }
     }
     
@@ -92,7 +92,7 @@ struct RefreshButton: View {
         }) {
             Image(systemName: "arrow.clockwise")
                 .font(.system(size: 14, weight: .medium))
-                .foregroundColor(.secondary)
+                .foregroundColor(ModernDesignSystem.Colors.secondaryText)
                 .rotationEffect(.degrees(rotationAngle))
                 .scaleEffect(isPressed ? 0.9 : 1.0)
                 .animation(.easeInOut(duration: 0.1), value: isPressed)
@@ -177,7 +177,7 @@ struct MainView: View {
                     
                     Text(LocalizedStrings.current.appSubtitle)
                         .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(.secondary)
+                        .foregroundColor(ModernDesignSystem.Colors.secondaryText)
                 }
                 
                 HStack {
@@ -187,7 +187,7 @@ struct MainView: View {
                     }) {
                         Image(systemName: "gearshape.fill")
                             .font(.system(size: 16))
-                            .foregroundColor(.secondary)
+                            .foregroundColor(ModernDesignSystem.Colors.secondaryText)
                     }
                     .buttonStyle(PlainButtonStyle())
                     .padding(.trailing, 20)
@@ -224,7 +224,7 @@ struct MainView: View {
                             HStack {
                                 Text(LocalizedStrings.current.builtInWallpapers)
                                     .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(.primary)
+                                    .foregroundColor(ModernDesignSystem.Colors.primaryText)
                                 Spacer()
                                 RefreshButton {
                                     WallpaperIndexer.shared.indexWallpapers()
@@ -283,9 +283,9 @@ struct MainView: View {
                 VStack(spacing: 6) {
                     Image(systemName: "arrow.down.doc.fill")
                         .font(.system(size: 24))
-                        .foregroundColor(.blue)
+                        .foregroundColor(ModernDesignSystem.Colors.infoColor)
                     Text(LocalizedStrings.current.dragFilesHere).font(.system(size: 13, weight: .medium))
-                    Text(LocalizedStrings.current.supportedFormats).font(.system(size: 10)).foregroundColor(.secondary)
+                    Text(LocalizedStrings.current.supportedFormats).font(.system(size: 10)).foregroundColor(ModernDesignSystem.Colors.secondaryText)
                 }
             )
 
@@ -299,7 +299,7 @@ struct MainView: View {
             VStack(spacing: 4) {
                 Text(statusMessage)
                     .font(.system(size: 12))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(ModernDesignSystem.Colors.secondaryText)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
 

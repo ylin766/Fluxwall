@@ -16,7 +16,7 @@ struct SettingsView: View {
                 }) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.system(size: 16))
-                        .foregroundColor(.secondary)
+                        .foregroundColor(ModernDesignSystem.Colors.secondaryText)
                 }
                 .buttonStyle(PlainButtonStyle())
             }
@@ -29,7 +29,7 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text(LocalizedStrings.current.languageSettings)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(ModernDesignSystem.Colors.secondaryText)
                 
                 VStack(spacing: 8) {
                     ForEach(SupportedLanguage.allCases, id: \.self) { language in
@@ -39,14 +39,14 @@ struct SettingsView: View {
                             HStack {
                                 Text(language.displayName)
                                     .font(.system(size: 14))
-                                    .foregroundColor(.primary)
+                                    .foregroundColor(ModernDesignSystem.Colors.primaryText)
                                 
                                 Spacer()
                                 
                                 if languageSettings.currentLanguage == language {
                                     Image(systemName: "checkmark.circle.fill")
                                         .font(.system(size: 16))
-                                        .foregroundColor(.blue)
+                                        .foregroundColor(ModernDesignSystem.Colors.infoColor)
                                 }
                             }
                             .padding(.horizontal, 16)

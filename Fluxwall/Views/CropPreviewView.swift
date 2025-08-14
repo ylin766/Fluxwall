@@ -52,7 +52,7 @@ struct CropPreviewView: View {
                 HStack {
                     Text("\(LocalizedStrings.current.scale): \(String(format: "%.2f×", scale))")
                         .font(.system(size: 12))
-                        .foregroundColor(.secondary)
+                        .foregroundColor(ModernDesignSystem.Colors.secondaryText)
                     Spacer()
                     Button(action: {
                         scale = 1.0

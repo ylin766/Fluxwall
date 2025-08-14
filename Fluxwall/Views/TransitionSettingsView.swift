@@ -30,7 +30,7 @@ struct AnimatedApplyButton: View {
             HStack(spacing: 6) {
                 Image(systemName: isSuccess ? "checkmark" : "photo.on.rectangle.angled")
                     .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(.white)
+                    .foregroundColor(ModernDesignSystem.Colors.buttonTextActive)
                 
                 Text(isSuccess ? LocalizedStrings.current.wallpaperApplied : LocalizedStrings.current.applyWallpaper)
                     .font(.system(size: 12, weight: .medium))
@@ -43,21 +43,21 @@ struct AnimatedApplyButton: View {
                     .fill(
                         LinearGradient(
                             colors: isEnabled ? (isSuccess ? [
-                                Color.green.opacity(0.9),
-                                Color.green.opacity(0.7)
+                                ModernDesignSystem.Colors.successColor.opacity(0.9),
+                                ModernDesignSystem.Colors.successColor.opacity(0.7)
                             ] : [
-                                Color.blue.opacity(0.9),
-                                Color.blue.opacity(0.7)
+                                ModernDesignSystem.Colors.infoColor.opacity(0.9),
+                                ModernDesignSystem.Colors.infoColor.opacity(0.7)
                             ]) : [
-                                Color.gray.opacity(0.3),
-                                Color.gray.opacity(0.2)
+                                ModernDesignSystem.Colors.tertiaryText.opacity(0.3),
+                                ModernDesignSystem.Colors.tertiaryText.opacity(0.2)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                     )
                     .shadow(
-                        color: isEnabled ? (isSuccess ? Color.green.opacity(0.4) : Color.blue.opacity(0.4)) : Color.clear,
+                        color: isEnabled ? (isSuccess ? ModernDesignSystem.Colors.successColor.opacity(0.4) : ModernDesignSystem.Colors.infoColor.opacity(0.4)) : Color.clear,
                         radius: isHovered ? 8 : 4,
                         x: 0,
                         y: isHovered ? 4 : 2
@@ -69,7 +69,7 @@ struct AnimatedApplyButton: View {
             .animation(.easeInOut(duration: 0.2), value: isHovered)
         }
         .buttonStyle(PlainButtonStyle())
-        .foregroundColor(.white)
+        .foregroundColor(ModernDesignSystem.Colors.buttonTextActive)
         .disabled(!isEnabled)
         .onHover { hovering in
             guard isEnabled else { return }
@@ -155,7 +155,7 @@ struct TransitionSettingsView: View {
                     Spacer()
                     Text("\(String(format: "%.1f", transitionDuration))\(LocalizedStrings.current.seconds)")
                         .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(.primary)
+                        .foregroundColor(ModernDesignSystem.Colors.primaryText)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 2)
                         .background(
@@ -258,17 +258,17 @@ struct TransitionTypeButton: View {
             VStack(spacing: 8) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
-                        .fill(Color(.controlBackgroundColor).opacity(0.5))
+                        .fill(ModernDesignSystem.Colors.cardBackground)
                         .frame(height: 45)
                         .frame(maxWidth: .infinity)
                     
                     getTransitionIcon()
-                        .foregroundColor(selectedType == type ? .white : .primary)
+                        .foregroundColor(selectedType == type ? ModernDesignSystem.Colors.buttonTextActive : ModernDesignSystem.Colors.primaryText)
                 }
                 
                 Text(getTransitionTypeName(type))
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(selectedType == type ? .white : .primary)
+                    .foregroundColor(selectedType == type ? ModernDesignSystem.Colors.buttonTextActive : ModernDesignSystem.Colors.primaryText)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
