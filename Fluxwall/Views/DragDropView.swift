@@ -43,7 +43,7 @@ class DragDropView: NSView {
     }
     
     private func updateAppearance() {
-        let isDarkMode = NSApp.effectiveAppearance?.name == .darkAqua
+        let isDarkMode = NSApp.effectiveAppearance.name == .darkAqua
         
         if isDragOver {
             layer?.backgroundColor = NSColor.systemBlue.withAlphaComponent(0.15).cgColor

@@ -143,23 +143,29 @@ struct ModernDesignSystem {
     }
     
     struct Shadow {
-        static let minimal = ShadowStyle(
-            color: Colors.subtleShadow,
-            radius: 2,
-            offset: CGSize(width: 0, height: 1)
-        )
+        static func minimal(for colorScheme: ColorScheme) -> ShadowStyle {
+            ShadowStyle(
+                color: Colors.subtleShadow(for: colorScheme),
+                radius: 2,
+                offset: CGSize(width: 0, height: 1)
+            )
+        }
         
-        static let light = ShadowStyle(
-            color: Colors.lightShadow,
-            radius: 4,
-            offset: CGSize(width: 0, height: 2)
-        )
+        static func light(for colorScheme: ColorScheme) -> ShadowStyle {
+            ShadowStyle(
+                color: Colors.lightShadow(for: colorScheme),
+                radius: 4,
+                offset: CGSize(width: 0, height: 2)
+            )
+        }
         
-        static let medium = ShadowStyle(
-            color: Colors.lightShadow,
-            radius: 8,
-            offset: CGSize(width: 0, height: 4)
-        )
+        static func medium(for colorScheme: ColorScheme) -> ShadowStyle {
+            ShadowStyle(
+                color: Colors.lightShadow(for: colorScheme),
+                radius: 8,
+                offset: CGSize(width: 0, height: 4)
+            )
+        }
         
         static let none = ShadowStyle(
             color: Color.clear,
@@ -187,14 +193,14 @@ struct ShadowStyle {
 struct AdaptiveCardStyle: ViewModifier {
     let isActive: Bool
     let cornerRadius: CGFloat
-    let shadowStyle: ShadowStyle
+    let shadowStyle: ShadowStyle?
     let borderIntensity: Double
     @Environment(\.colorScheme) var colorScheme
     
     init(
         isActive: Bool = false,
         cornerRadius: CGFloat = ModernDesignSystem.CornerRadius.medium,
-        shadowStyle: ShadowStyle = ModernDesignSystem.Shadow.minimal,
+        shadowStyle: ShadowStyle? = nil,
         borderIntensity: Double = 1.0
     ) {
         self.isActive = isActive
@@ -230,9 +236,9 @@ struct AdaptiveCardStyle: ViewModifier {
             )
             .shadow(
                 color: ModernDesignSystem.Colors.subtleShadow(for: colorScheme),
-                radius: shadowStyle.radius,
-                x: shadowStyle.offset.width,
-                y: shadowStyle.offset.height
+                radius: shadowStyle?.radius ?? 2,
+                x: shadowStyle?.offset.width ?? 0,
+                y: shadowStyle?.offset.height ?? 1
             )
     }
 }
@@ -268,7 +274,7 @@ struct AdaptiveButtonStyle: ButtonStyle {
                     cornerRadius: cornerRadius,
                     shadowStyle: configuration.isPressed ? 
                         ModernDesignSystem.Shadow.none : 
-                        ModernDesignSystem.Shadow.minimal,
+                        nil,
                     borderIntensity: configuration.isPressed ? borderIntensity * 1.2 : borderIntensity
                 )
             )
@@ -406,7 +412,7 @@ extension View {
     func adaptiveCard(
         isActive: Bool = false,
         cornerRadius: CGFloat = ModernDesignSystem.CornerRadius.medium,
-        shadowStyle: ShadowStyle = ModernDesignSystem.Shadow.minimal,
+        shadowStyle: ShadowStyle? = nil,
         borderIntensity: Double = 1.0
     ) -> some View {
         self.modifier(
@@ -436,7 +442,7 @@ extension View {
     func flatCard(
         isActive: Bool = false,
         cornerRadius: CGFloat = ModernDesignSystem.CornerRadius.medium,
-        shadowStyle: ShadowStyle = ModernDesignSystem.Shadow.minimal,
+        shadowStyle: ShadowStyle? = nil,
         borderIntensity: Double = 1.0
     ) -> some View {
         self.adaptiveCard(
@@ -462,7 +468,7 @@ extension View {
     func glassCard(
         isActive: Bool = false,
         cornerRadius: CGFloat = ModernDesignSystem.CornerRadius.medium,
-        shadowStyle: ShadowStyle = ModernDesignSystem.Shadow.minimal,
+        shadowStyle: ShadowStyle? = nil,
         glassIntensity: Double = 1.0
     ) -> some View {
         self.adaptiveCard(
@@ -488,7 +494,7 @@ extension View {
     func modernCard(
         isActive: Bool = false,
         cornerRadius: CGFloat = ModernDesignSystem.CornerRadius.medium,
-        shadowStyle: ShadowStyle = ModernDesignSystem.Shadow.minimal
+        shadowStyle: ShadowStyle? = nil
     ) -> some View {
         self.adaptiveCard(
             isActive: isActive,

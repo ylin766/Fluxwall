@@ -65,7 +65,7 @@ struct WebWallpaperURLInput: View {
             }
         }
         .padding(12)
-        .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
+        .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large)
         .onTapGesture {
             // Only focus when user explicitly taps on the component
             if !isTextFieldFocused {

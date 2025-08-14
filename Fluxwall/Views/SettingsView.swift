@@ -54,13 +54,7 @@ struct SettingsView: View {
                             .flatCard(
                                 isActive: languageSettings.currentLanguage == language,
                                 cornerRadius: ModernDesignSystem.CornerRadius.medium,
-                                shadowStyle: ModernDesignSystem.Shadow.minimal,
                                 borderIntensity: languageSettings.currentLanguage == language ? 1.2 : 0.8
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(languageSettings.currentLanguage == language ? 
-                                           Color.blue : Color.clear, lineWidth: 1)
                             )
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -72,7 +66,7 @@ struct SettingsView: View {
             Spacer()
         }
         .frame(width: 300, height: 200)
-        .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.extraLarge, shadowStyle: ModernDesignSystem.Shadow.light)
+        .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.extraLarge)
     }
 }
 

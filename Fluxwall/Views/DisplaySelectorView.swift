@@ -294,7 +294,7 @@ struct DisplayCard: View {
                     .cornerRadius(3)
             } else {
                 Rectangle()
-                    .fill(ModernDesignSystem.Colors.cardBackground)
+                    .fill(Color(.controlBackgroundColor).opacity(0.6))
                     .frame(width: 80, height: 50)
                     .cornerRadius(3)
                     .overlay(
@@ -317,7 +317,6 @@ struct DisplayCard: View {
         .glassCard(
             isActive: isSelected,
             cornerRadius: 6,
-            shadowStyle: ModernDesignSystem.Shadow.minimal,
             glassIntensity: isSelected ? 1.0 : 0.6
         )
     }

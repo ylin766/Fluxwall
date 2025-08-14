@@ -67,7 +67,6 @@ struct CropPreviewView: View {
                             .padding(.vertical, 4)
                             .glassCard(
                                 cornerRadius: 6,
-                                shadowStyle: ModernDesignSystem.Shadow.minimal,
                                 glassIntensity: 0.8
                             )
                     }

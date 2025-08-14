@@ -230,7 +230,7 @@ struct MainView: View {
                             }
                         }
                         .padding(12)
-                        .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
+                        .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large)
                         .frame(maxHeight: .infinity)
                         
                         cropPreviewPanel()
@@ -315,13 +315,13 @@ struct MainView: View {
                 .padding(.vertical, 6)
             }
             .buttonStyle(BorderlessButtonStyle())
-            .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.medium, shadowStyle: ModernDesignSystem.Shadow.minimal, borderIntensity: 0.8)
+            .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.medium, borderIntensity: 0.8)
             .disabled(wallpaperManager.currentWallpaperName == LocalizedStrings.current.systemDefault && !wallpaperManager.isVideoActive)
 
             Spacer()
         }
         .padding(12)
-        .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
+        .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large)
     }
 
     @ViewBuilder
@@ -330,7 +330,7 @@ struct MainView: View {
             selectedDisplayID = displayID
         })
         .padding(12)
-        .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
+        .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large)
     }
     
     @ViewBuilder
@@ -354,11 +354,11 @@ struct MainView: View {
                 offset: $offset
             )
             .padding(12)
-            .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
+            .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large)
         } else {
             Text(LocalizedStrings.current.previewPrompt)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
+                .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large)
         }
     }
 
@@ -375,7 +375,7 @@ struct MainView: View {
             applyWallpaper() 
         }
         .padding(12)
-        .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large, shadowStyle: ModernDesignSystem.Shadow.minimal)
+        .flatCard(cornerRadius: ModernDesignSystem.CornerRadius.large)
     }
 
     private func selectFile() {

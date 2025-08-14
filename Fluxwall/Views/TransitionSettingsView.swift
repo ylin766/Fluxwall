@@ -160,7 +160,7 @@ struct TransitionSettingsView: View {
                         .padding(.vertical, 2)
                         .background(
                             RoundedRectangle(cornerRadius: 4)
-                                .fill(ModernDesignSystem.Colors.cardBackground)
+                                .fill(Color(.controlBackgroundColor).opacity(0.6))
                         )
                 }
                 
@@ -258,7 +258,7 @@ struct TransitionTypeButton: View {
             VStack(spacing: 8) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
-                        .fill(ModernDesignSystem.Colors.cardBackground)
+                        .fill(Color(.controlBackgroundColor).opacity(0.6))
                         .frame(height: 45)
                         .frame(maxWidth: .infinity)
                     
